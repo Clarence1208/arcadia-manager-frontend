@@ -1,0 +1,14 @@
+/*Import colors file */
+@import url('./colors.css');
+
+body{
+    font-family: Lato, sans-serif;
+}
+
+h1{
+  color: var(--dark-grey-text);
+}
+
+.green{
+    color: var(--dark-green);
+}
