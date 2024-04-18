@@ -7,8 +7,8 @@ function LogInForm() {
             <form id="formLogin">
                 <h1>Portail d'accès au panneau de gestion</h1>
 
-                <TextField id="loginEmailInput" label="E-mail" variant="outlined"/>
-                <TextField id="loginPasswordInput" label="Mot de passe" variant="outlined"/>
+                <TextField id="loginEmailInput" label="E-mail" type="email" variant="outlined"/>
+                <TextField id="loginPasswordInput" label="Mot de passe" type="password" variant="outlined"/>
 
                 <div id="form-footer">
                     <Button id="login-button" color="primary" variant="contained" disableElevation >Se connecter</Button>

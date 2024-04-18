@@ -1,8 +1,9 @@
 import Header from "../components/Header";
 import '../styles/Home.css';
-import Logo from '../images/logo-black.svg';
+import Logo from '../images/logo-green.svg';
 import {Button} from "@mui/material";
 import {Footer} from "../components/Footer";
+
 
 export function Home() {
 

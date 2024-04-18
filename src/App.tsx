@@ -13,6 +13,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<LogIn />} />
+                <Route path="/services/" element={<Home />} />
                 <Route path='*' element={<NotFound />}/>
             </Routes>
         </BrowserRouter>
