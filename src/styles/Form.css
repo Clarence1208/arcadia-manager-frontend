@@ -9,4 +9,13 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
+    min-width: 40vw;
+}
+
+.form-inputs{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    height: 50vh;
 }

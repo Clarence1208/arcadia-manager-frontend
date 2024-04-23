@@ -8,3 +8,6 @@ h1{
 .green{
     color: var(--dark-green);
 }
+.alert{
+    max-width: 30vw;
+}
