@@ -11,3 +11,8 @@ h1{
 .alert{
     max-width: 30vw;
 }
+
+.main{
+    margin: 8vh;
+    min-height: 60vh;
+}

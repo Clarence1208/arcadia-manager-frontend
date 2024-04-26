@@ -14,7 +14,7 @@ export function Home() {
                     <img src={Logo} alt={"logo"} />
                     <div>
                         <h1>Créer le site pour votre association 100 % personalisable en <span className="green">5 minutes</span> !</h1>
-                        <Button variant="contained" color="primary">Créer un site</Button>
+                        <Button href={"/websites/new"} variant="contained" color="primary">Créer un site</Button>
                     </div>
                 </div>
                 <Footer />

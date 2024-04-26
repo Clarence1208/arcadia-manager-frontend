@@ -1,13 +1,15 @@
 import Header from "../components/Header";
 import {Footer} from "../components/Footer";
 
-export function NotFound(){
+export function AdminDashboard(){
     return (
         <div>
             <Header />
 
             <div className="main">
-                <h1>Erreur 404 -Cette page n'existe pas.</h1>
+
+                <h2>Tableau de bord de NAME</h2>
+                {/* NAV SUR LE COTE */}
 
             </div>
 
