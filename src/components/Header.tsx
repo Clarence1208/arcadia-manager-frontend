@@ -3,6 +3,9 @@ import logo from '../images/logo.png';
 import {Link} from "@mui/material";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {LogIn} from "../routes/LogIn";
+import {useContext} from "react";
+import {UserSessionContext} from "../contexts/user-session";
 
 interface CustomNavItemProps {
     link: string;
@@ -18,6 +21,8 @@ export function CustomNavItem(props: CustomNavItemProps){
     )
 }
 export default function Header() {
+    const userSession = useContext(UserSessionContext);
+
     return (
         <div>
       <div className="main-header">
@@ -29,7 +34,10 @@ export default function Header() {
               <CustomNavItem link="/websites/new" text="Créer un site" />
                 <CustomNavItem link="/contact" text="Contact" />
           </div>
+
+          <a href= {userSession?.isLoggedIn ? "/login" : "/logout"}>
           <PersonOutlineIcon className="icon" fontSize={"large"} />
+          </a>
       </div>
             <div className="footer-header"></div>
         </div>

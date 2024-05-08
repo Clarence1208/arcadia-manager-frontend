@@ -1,18 +1,65 @@
-import {Button, TextField, useTheme} from "@mui/material";
+import {Alert, Button, TextField, useTheme} from "@mui/material";
 import '../styles/LogIn.css';
 import '../styles/App.css';
+import {FormEvent, useContext, useState} from "react";
+import {redirect, useNavigate} from "react-router-dom";
+import {AdminDashboard} from "./AdminDashboard";
+import {UserSessionContext} from "../contexts/user-session";
+
+type LogInData = {
+    email: string,
+    password: string
+}
+const body : LogInData = {
+    email: "",
+    password: ""
+}
 
 function LogInForm() {
-    return (
-            <form id="formLogin">
-                <h1>Portail d'accès au panneau de gestion</h1>
+    let navigate = useNavigate();
+    const userSession = useContext(UserSessionContext)
+    const [ErrorMessage, setErrorMessage] = useState("")
+    const [data, setData] = useState(body)
 
-                <TextField id="loginEmailInput" label="E-mail" type="email" variant="outlined"/>
-                <TextField id="loginPasswordInput" label="Mot de passe" type="password" variant="outlined"/>
+    function updateFields(fields: Partial<LogInData>) {
+        setData(prev => {
+            return { ...prev, ...fields }
+        })
+    }
+    async function onSubmit(e: FormEvent) {
+        e.preventDefault()
+        const response: Response = await fetch("http://localhost:3000/users/login", {method: "POST", body: JSON.stringify(data), headers: {"Content-Type": "application/json"}});
+        if (!response.ok) {
+            const error =  await response.json()
+            setErrorMessage("Erreur : " + await error.message);
+            return
+        }
+        setErrorMessage("");
+        const res = await response.json();
+        if (userSession){
+            console.log(res)
+            userSession.isLoggedIn = true
+            userSession.fullName = res.firstName + " " + res.surname
+        }
+        navigate('/admin/dashboard')
+
+    }
+
+    function handlePasswordChange(){
+        return <Alert color={"warning"}>A reset link will be sent (feature not included yet)</Alert>
+    }
+
+    return (
+            <form id="formLogin" onSubmit={onSubmit}>
+                <h1>Portail d'accès au panneau de gestion</h1>
+                {ErrorMessage ?? <Alert className={"alert"} severity="error" onClose={() => {}}>{ErrorMessage}</Alert>}
+
+                <TextField id="loginEmailInput" label="E-mail" type="email" variant="outlined" onChange={e => updateFields({ email: e.target.value })} />
+                <TextField id="loginPasswordInput" label="Mot de passe" type="password" variant="outlined" onChange={event => updateFields({password: event.target.value})}/>
 
                 <div id="form-footer">
-                    <Button id="login-button" color="primary" variant="contained" disableElevation >Se connecter</Button>
-                    <a href="/">Mot de passe oublié ?</a>
+                    <Button id="login-button" color="primary" variant="contained" type="submit" disableElevation >Se connecter</Button>
+                    <a onClick={handlePasswordChange}>Mot de passe oublié ?</a>
                 </div>
 
 

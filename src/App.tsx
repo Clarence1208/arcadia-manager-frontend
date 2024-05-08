@@ -7,12 +7,14 @@ import {NotFound} from "./routes/NotFound";
 import {NewWebsite} from "./routes/NewWebsite";
 import {Services} from "./routes/Services";
 import {AdminDashboard} from "./routes/AdminDashboard";
+import {UserSessionProvider} from "./contexts/user-session";
 
 
 function App() {
 
     return (
         <BrowserRouter>
+            <UserSessionProvider>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<LogIn />} />
@@ -21,6 +23,7 @@ function App() {
                 <Route path="/admin/dashboard" element={< AdminDashboard />} />
                 <Route path='*' element={<NotFound />}/>
             </Routes>
+            </UserSessionProvider>
         </BrowserRouter>
     );
 }

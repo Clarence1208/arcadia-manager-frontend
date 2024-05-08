@@ -53,7 +53,8 @@ export function NewWebsite() {
 
         const response: Response = await fetch("http://localhost:3000/users/register", {method: "POST", body: JSON.stringify(userData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
-            setErrorMessage("Erreur lors de la création du compte: " + await response.text());
+            const error =  await response.json()
+            setErrorMessage("Erreur lors de la création du compte: " + await error.message);
             setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
             return
         }
@@ -64,8 +65,8 @@ export function NewWebsite() {
     async function createWebsite(websiteData: { dbUsername: string; userId: any; url: string; dbPassword: string }) {
         const response: Response = await fetch("http://localhost:3000/websites", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
-
-            setErrorMessage("Erreur lors de la création du site web: " + await response.text());
+            const error =  await response.json()
+            setErrorMessage("Erreur lors de la création du site web: " + await error.message);
             setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
             return
         }
