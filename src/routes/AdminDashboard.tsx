@@ -12,7 +12,7 @@ export function AdminDashboard(){
 
             <div className="main">
 
-                <h2>Tableau de bord de {userSession?.fullName || "l'administrateur"}</h2>
+                <h2>Tableau de bord de {userSession?.userSession.fullName || "l'administrateur"}</h2>
                 {/* NAV SUR LE COTE */}
 
             </div>

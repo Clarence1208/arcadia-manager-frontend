@@ -17,7 +17,8 @@ const body : LogInData = {
 
 function LogInForm() {
     let navigate = useNavigate();
-    const userSession = useContext(UserSessionContext)
+    const sessionContext = useContext(UserSessionContext)
+
     const [ErrorMessage, setErrorMessage] = useState("")
     const [data, setData] = useState(body)
 
@@ -36,10 +37,9 @@ function LogInForm() {
         }
         setErrorMessage("");
         const res = await response.json();
-        if (userSession){
-            console.log(res)
-            userSession.isLoggedIn = true
-            userSession.fullName = res.firstName + " " + res.surname
+        if (sessionContext){
+           sessionContext.updateUserSession({ loginToken: res.loginToken,
+               fullName: res.firstName + " " + res.surname, isLoggedIn: true})
         }
         navigate('/admin/dashboard')
 

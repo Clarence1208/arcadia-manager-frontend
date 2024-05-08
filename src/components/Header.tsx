@@ -22,6 +22,7 @@ export function CustomNavItem(props: CustomNavItemProps){
 }
 export default function Header() {
     const userSession = useContext(UserSessionContext);
+    console.log(userSession)
 
     return (
         <div>
@@ -35,7 +36,7 @@ export default function Header() {
                 <CustomNavItem link="/contact" text="Contact" />
           </div>
 
-          <a href= {userSession?.isLoggedIn ? "/login" : "/logout"}>
+          <a href= {userSession?.userSession.isLoggedIn ? "/logout" : "/login"}>
           <PersonOutlineIcon className="icon" fontSize={"large"} />
           </a>
       </div>
