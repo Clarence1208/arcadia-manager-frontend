@@ -40,6 +40,8 @@ function LogInOutButton() {
 }
 export default function Header() {
 
+    const userSession = useContext(UserSessionContext)?.userSession;
+
     return (
         <div>
       <div className="main-header">
@@ -50,6 +52,7 @@ export default function Header() {
              <CustomNavItem link="/services" text="Nos services" expand={true} />
               <CustomNavItem link="/websites/new" text="Créer un site" />
                 <CustomNavItem link="/contact" text="Contact" />
+              {userSession?.isLoggedIn && <CustomNavItem link="/dashboard" text="Tableau de bord" />}
           </div>
 
           <LogInOutButton />
