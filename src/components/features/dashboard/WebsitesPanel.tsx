@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
-import {Delete, Edit} from "@mui/icons-material";
-import {Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
-
+import {AddCircleOutline, Delete, Edit} from "@mui/icons-material";
+import {Button, Link, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import logo from "../../../images/logo.png";
 type Website = {
     id: number;
     url: string;
@@ -50,16 +50,19 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
         return (
             <div>
                 <h2>Vos sites web</h2>
-                <p>Vous pouvez gérer les sites web d'ici</p>
-
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <p>Vous pouvez gérer les sites web d'ici</p>
+                    <Link href={"/websites/new"} style={{marginLeft: "3vw"}} title={"Ajouter un site"}><AddCircleOutline/></Link>
+                </div>
                 {errorMessage && <div className="error">{errorMessage}</div>}
 
                 <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Website URL</TableCell>
+                                <TableCell>URL du site</TableCell>
                                 <TableCell align="right">Statut</TableCell>
+                                <TableCell align="right">Logo</TableCell>
                                 <TableCell align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
@@ -72,10 +75,11 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                                     <TableCell component="th" scope="row">
                                         {website.url}
                                     </TableCell>
-                                    <TableCell align="right">{website.status}</TableCell>
+                                    <TableCell style={{color: website.status === "active"? "green": "red"}} align="right">{website.status}</TableCell>
+                                   <TableCell align="center"><a onClick={()=>alert("Flemme")}>Voir l'image</a></TableCell>
                                     <TableCell align="right">
-                                        <Button><Edit /></Button>
-                                        <Button>{<Delete />}</Button>
+                                        <Button title={"Modifier"}><Edit /></Button>
+                                        <Button title={"Supprimer"}>{<Delete />}</Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
