@@ -1,4 +1,4 @@
-import {Alert, Button, TextField, useTheme} from "@mui/material";
+import {Alert, Button, Link, TextField, useTheme} from "@mui/material";
 import '../styles/LogIn.css';
 import '../styles/App.css';
 import {FormEvent, useContext, useState} from "react";
@@ -46,7 +46,7 @@ function LogInForm() {
     }
 
     function handlePasswordChange(){
-        return <Alert color={"warning"}>A reset link will be sent (feature not included yet)</Alert>
+       alert("flemme.")
     }
 
     return (
@@ -59,7 +59,8 @@ function LogInForm() {
 
                 <div id="form-footer">
                     <Button id="login-button" color="primary" variant="contained" type="submit" disableElevation >Se connecter</Button>
-                    <a onClick={handlePasswordChange}>Mot de passe oublié ?</a>
+                    <Link href="/" onClick={handlePasswordChange}>Mot de passe oublié ?</Link>
+                    <Link href={"/register"}>Créer un compte ?</Link>
                 </div>
 
 

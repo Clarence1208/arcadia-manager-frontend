@@ -47,7 +47,7 @@ export function Dashboard(){
         <div>
             <Header />
 
-            <div className="main">
+            <div id="dahsboard-main" className="main">
 
                 <Tabs
                     className="panels-tabs"

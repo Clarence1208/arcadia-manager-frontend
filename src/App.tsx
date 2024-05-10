@@ -10,6 +10,7 @@ import {Dashboard} from "./routes/Dashboard";
 import { UserSessionProvider } from "./contexts/user-session";
 import Logout from "./routes/Logout";
 import {Register} from "./routes/Register";
+import {Contact} from "./routes/Contact";
 
 function App() {
 
@@ -24,6 +25,8 @@ function App() {
                 <Route path="/dashboard" element={< Dashboard />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/logout" element={<Logout />} />
+                <Route path="/contact" element={<Contact />} />
+
                 <Route path='*' element={<NotFound />}/>
             </Routes>
             </UserSessionProvider>
