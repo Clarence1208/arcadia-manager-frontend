@@ -38,7 +38,7 @@ function LogInForm() {
         setErrorMessage("");
         const res = await response.json();
         if (sessionContext){
-           sessionContext.updateUserSession({ loginToken: res.loginToken,
+           sessionContext.updateUserSession({ userId: res.id, loginToken: res.loginToken,
                fullName: res.firstName + " " + res.surname, isLoggedIn: true})
         }
         navigate('/dashboard')

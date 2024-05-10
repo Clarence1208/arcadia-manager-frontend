@@ -15,12 +15,13 @@ type WebsitesPanelProps = {
 export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     const [errorMessage, setErrorMessage] = useState<string>("")
     const [websites, setWebsites] = useState<Website[]>([])
+    console.log(userId, userToken)
 
     useEffect(() => {
-            if (userToken) {
+            if (userToken && userId) {
                 const getWebsites = async (filters: WebsitesFilters): Promise<Website[]> => {
                     const bearer = "Bearer " + userToken;
-                    const response: Response = await fetch("http://localhost:3000/websites", {
+                    const response: Response = await fetch(`http://localhost:3000/websites?userId=${userId}`, {
                         headers: {
                             "Authorization": bearer,
                             "Content-Type": "application/json"
@@ -33,12 +34,15 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                         return []
                     }
                     const res = await response.json();
+                    if (res.length === 0) {
+                        setErrorMessage("Aucun site web trouvé")
+                    }
                     return res;
                 }
-                const fetchedWebsites = getWebsites({userId: userId}).then(setWebsites)
+                getWebsites({userId: userId}).then(setWebsites)
             }
         }
-    , [userToken])
+    , [userToken, userId])
 
     if (websites.length === 0) {
         return <div>Loading...</div>
