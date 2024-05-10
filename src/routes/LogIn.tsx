@@ -3,7 +3,7 @@ import '../styles/LogIn.css';
 import '../styles/App.css';
 import {FormEvent, useContext, useState} from "react";
 import {redirect, useNavigate} from "react-router-dom";
-import {AdminDashboard} from "./AdminDashboard";
+import {Dashboard} from "./Dashboard";
 import {UserSessionContext} from "../contexts/user-session";
 
 type LogInData = {
@@ -41,7 +41,7 @@ function LogInForm() {
            sessionContext.updateUserSession({ loginToken: res.loginToken,
                fullName: res.firstName + " " + res.surname, isLoggedIn: true})
         }
-        navigate('/admin/dashboard')
+        navigate('/dashboard')
 
     }
 

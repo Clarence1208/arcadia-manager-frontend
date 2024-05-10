@@ -1,6 +1,7 @@
-import {createContext, FC, ReactNode, useEffect, useMemo, useState} from "react";
+import {createContext, FC, ReactNode, useEffect, useState} from "react";
 
-interface IUserSession {
+export interface IUserSession {
+    userId?: number;
     isLoggedIn: boolean;
     fullName: string;
     backPage: string;
@@ -28,23 +29,22 @@ export const UserSessionProvider: FC<IProps> = ({ children }) => {
         roles: [],
     });
 
-    //le contexte ne persistait pas donc on tente de stocker dans local storage mais c'est de la D ça marche pas.
     useEffect(() => {
         // Retrieve user session data from local storage on component mount
         const storedUserSession = localStorage.getItem("userSession");
         if (storedUserSession) {
             setUserSession(JSON.parse(storedUserSession));
+        }else{
+            console.warn("no user session exists")
         }
     }, []);
 
-    useEffect(() => {
-        // Write updated user session data to local storage whenever it changes
-        localStorage.setItem("userSession", JSON.stringify(userSession));
-    }, [userSession]);
-
     const updateUserSession = (newUserSession: Partial<IUserSession>) => {
-        setUserSession({...userSession, ...newUserSession});
-        console.log(userSession)
+        setUserSession(prevUserSession => {
+            const updatedUserSession = { ...prevUserSession, ...newUserSession };
+            localStorage.setItem("userSession", JSON.stringify(updatedUserSession));
+            return updatedUserSession;
+        })
     };
 
 

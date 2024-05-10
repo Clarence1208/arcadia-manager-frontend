@@ -2,8 +2,8 @@ import '../styles/Header.css';
 import logo from '../images/logo.png';
 import {Link} from "@mui/material";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import PersonRemoveAlt1Icon from '@mui/icons-material/PersonRemoveAlt1';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {LogIn} from "../routes/LogIn";
 import {useContext} from "react";
 import {UserSessionContext} from "../contexts/user-session";
 
@@ -20,9 +20,25 @@ export function CustomNavItem(props: CustomNavItemProps){
         </div>
     )
 }
-export default function Header() {
+
+function LogInOutButton() {
     const userSession = useContext(UserSessionContext);
-    console.log(userSession)
+    const userIsLoggedIn = userSession?.userSession.isLoggedIn;
+    if (userIsLoggedIn) {
+        return (
+            <a href={"/logout"}>
+                <PersonRemoveAlt1Icon className="icon" fontSize={"large"} />
+            </a>
+        )
+    }else{
+        return (
+            <a href={"/login"}>
+                <PersonOutlineIcon className="icon" fontSize={"large"} />
+            </a>
+        )
+    }
+}
+export default function Header() {
 
     return (
         <div>
@@ -36,9 +52,7 @@ export default function Header() {
                 <CustomNavItem link="/contact" text="Contact" />
           </div>
 
-          <a href= {userSession?.userSession.isLoggedIn ? "/logout" : "/login"}>
-          <PersonOutlineIcon className="icon" fontSize={"large"} />
-          </a>
+          <LogInOutButton />
       </div>
             <div className="footer-header"></div>
         </div>
