@@ -15,13 +15,12 @@ type WebsitesPanelProps = {
 export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     const [errorMessage, setErrorMessage] = useState<string>("")
     const [websites, setWebsites] = useState<Website[]>([])
-    console.log(userId, userToken)
 
     useEffect(() => {
             if (userToken && userId) {
                 const getWebsites = async (filters: WebsitesFilters): Promise<Website[]> => {
                     const bearer = "Bearer " + userToken;
-                    const response: Response = await fetch(`http://localhost:3000/websites?userId=${userId}`, {
+                    const response: Response = await fetch(`${process.env.REACT_APP_API_URL}/websites?userId=${userId}`, {
                         headers: {
                             "Authorization": bearer,
                             "Content-Type": "application/json"
@@ -45,7 +44,7 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     , [userToken, userId])
 
     if (websites.length === 0) {
-        return <div>Loading...</div>
+        return <div>No websites...</div>
     }else{
         return (
             <div>
@@ -73,7 +72,7 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
-                                        {website.url}
+                                        <a href={"https://"+ website.url + ".arcadia-solution.com"}>{website.url}</a>
                                     </TableCell>
                                     <TableCell style={{color: website.status === "active"? "green": "red"}} align="right">{website.status}</TableCell>
                                    <TableCell align="center"><a onClick={()=>alert("Flemme")}>Voir l'image</a></TableCell>

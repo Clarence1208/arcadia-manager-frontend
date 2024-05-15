@@ -10,6 +10,7 @@ import {Footer} from "../components/Footer";
 import {Alert, Button, CircularProgress} from "@mui/material";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {UserSessionContext} from "../contexts/user-session";
+import {useNavigate} from "react-router-dom";
 
 type FormData = {
     firstName: string
@@ -30,6 +31,7 @@ const body: FormData = {
     dbPassword: ""
 }
 export function NewWebsite() {
+    const navigate = useNavigate()
     const userSessionContext = useContext(UserSessionContext)
     const userSession = userSessionContext?.userSession
     const [data, setData] = useState(body)
@@ -54,13 +56,12 @@ export function NewWebsite() {
     if (userSession?.isLoggedIn) {
         forms = forms.slice(1,2)
     }
-    console.log(forms)
     const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } = useMultiStepForm(forms)
 
 
     async function createUser(userData: { firstName: string; password: string; surname: string; email: string }) {
 
-        const response: Response = await fetch("http://localhost:3000/users/register", {method: "POST", body: JSON.stringify(userData), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/users/register", {method: "POST", body: JSON.stringify(userData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur lors de la création du compte: " + await error.message);
@@ -72,7 +73,7 @@ export function NewWebsite() {
     }
 
     async function logInUser(email: string, password: string) {
-        const response: Response = await fetch("http://localhost:3000/users/login", {method: "POST", body: JSON.stringify(data), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(process.env.REACT_APP_API_URL +"/users/login", {method: "POST", body: JSON.stringify(data), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur : " + await error.message);
@@ -86,7 +87,7 @@ export function NewWebsite() {
         }
     }
     async function createWebsite(websiteData: { dbUsername: string; userId: any; url: string; dbPassword: string }) {
-        const response: Response = await fetch("http://localhost:3000/websites", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
@@ -126,6 +127,7 @@ export function NewWebsite() {
         if (!website) return
 
         setWebsiteCreationProcess({...websiteCreationProcess, status: "done", message: "Votre site a été créé avec succès!"})
+        navigate("/dashboard")
     }
 
     return (

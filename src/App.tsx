@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './styles/App.css';
 import {Home} from "./routes/Home";
@@ -7,7 +7,7 @@ import {NotFound} from "./routes/NotFound";
 import {NewWebsite} from "./routes/NewWebsite";
 import {Services} from "./routes/Services";
 import {Dashboard} from "./routes/Dashboard";
-import { UserSessionProvider } from "./contexts/user-session";
+import {UserSessionContext, UserSessionProvider} from "./contexts/user-session";
 import Logout from "./routes/Logout";
 import {Register} from "./routes/Register";
 import {Contact} from "./routes/Contact";
