@@ -92,13 +92,13 @@ export function NewWebsite() {
         // setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
         // createWebsite(websiteData);
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "Déploiement du domaine"})
         await (websiteData);
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "Déploiement API"})
         await deployAPI(websiteData);
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "DÉPLOIEMENT FRONT"})
         await deployFront(websiteData);
 
         setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
@@ -173,8 +173,8 @@ async function deployFront(websiteData: { name: string; userId: number; subDomai
         if (!isLastStep) return next()
 
         let user;
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading"})
-        if (!userSession?.isLoggedIn) {
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "Starting process"})
+        /*if (!userSession?.isLoggedIn) {
             const userData = {
                 firstName: data.firstName,
                 surname: data.surname,
@@ -184,13 +184,13 @@ async function deployFront(websiteData: { name: string; userId: number; subDomai
             user = await createUser(userData)
             if (!user) return
             setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
-        }
+        }*/
 
         const websiteData = {
             subDomain: data.subDomain,
             name: data.name,
             dbPassword: data.dbPassword,
-            userId: userSession?.userId || user.id
+            userId: userSession?.userId || 1
         }
         const website = await deployWesbite(websiteData)
         // const website = await createWebsite(websiteData)
