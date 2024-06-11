@@ -3,8 +3,8 @@ import {Alert, InputAdornment, TextField} from "@mui/material";
 import '../../../styles/App.css';
 
 type WebsiteData = {
-    url: string,
-    dbUsername: string,
+    subDomain: string,
+    name: string,
     dbPassword: string,
 }
 
@@ -23,8 +23,8 @@ export function WebsiteForm(props: WebsiteFormProps) {
             <p>{props.formDescription}</p>
             {props.formError && <Alert className={"alert"} severity="error" onClose={() => {}}>{props.formError} </Alert>}
             <div className="form-inputs">
-                <TextField variant="outlined" label="Website url" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>,}} autoFocus required type="text" value={props.url} onChange={e => props.updateFields({ url: e.target.value })} />
-                <TextField variant="outlined" label="Super Administrator login" required type="text" value={props.dbUsername} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
+                <TextField variant="outlined" label="Website url" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>,}} autoFocus required type="text" value={props.subDomain} onChange={e => props.updateFields({ subDomain: e.target.value })} />
+                <TextField variant="outlined" label="Super Administrator login" required type="text" value={props.name} onChange={e => props.updateFields({name: e.target.value})}/>
                 <TextField variant="outlined" label="Administrator password" required type="password" value={props.dbPassword} onChange={e => props.updateFields({ dbPassword: e.target.value })} />
 
             </div>

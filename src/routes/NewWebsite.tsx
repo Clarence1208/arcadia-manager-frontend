@@ -17,8 +17,8 @@ type FormData = {
     surname: string
     email: string
     password: string
-    url: string,
-    dbUsername: string,
+    subDomain: string,
+    name: string,
     dbPassword: string,
 }
 const body: FormData = {
@@ -26,8 +26,8 @@ const body: FormData = {
     surname: "",
     email: "",
     password: "",
-    url: "",
-    dbUsername: "",
+    subDomain: "",
+    name: "",
     dbPassword: ""
 }
 export function NewWebsite() {
@@ -86,7 +86,75 @@ export function NewWebsite() {
                 fullName: res.firstName + " " + res.surname, isLoggedIn: true})
         }
     }
-    async function createWebsite(websiteData: { dbUsername: string; userId: any; url: string; dbPassword: string }) {
+
+    async function deployWesbite(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
+
+        // setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        // createWebsite(websiteData);
+
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        await (websiteData);
+
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        await deployAPI(websiteData);
+
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        await deployFront(websiteData);
+
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        await deployNGINX(websiteData);
+
+        //POTENTIALLY A LAST HEALTH CHECK CALL
+
+    }
+
+    async function deployDomain(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
+        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites/scripts/domain", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        if (!response.ok) {
+            const error =  await response.json()
+            setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setWebsiteCreationProcess({...websiteCreationProcess, status: "Failed"})
+            return;
+        }
+        return await response.json();
+    }
+
+    async function deployAPI(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
+        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites/scripts/apiDocker", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        if (!response.ok) {
+            const error =  await response.json()
+            setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setWebsiteCreationProcess({...websiteCreationProcess, status: "Failed"})
+            return;
+        }
+        return await response.json();
+    }
+
+async function deployFront(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
+        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites/scripts/frontDocker", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        if (!response.ok) {
+            const error =  await response.json()
+            setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setWebsiteCreationProcess({...websiteCreationProcess, status: "Failed"})
+            return;
+        }
+        return await response.json();
+    }
+
+    async function deployNGINX(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
+        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites/scripts/confNGINX", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        if (!response.ok) {
+            const error =  await response.json()
+            setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setWebsiteCreationProcess({...websiteCreationProcess, status: "Failed"})
+            return;
+        }
+        return await response.json();
+    }
+
+
+
+    async function createWebsite(websiteData: { dbUsername: string; userId: number; url: string; dbPassword: string }) {
         const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
@@ -94,6 +162,7 @@ export function NewWebsite() {
             setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
             return
         }
+
         const res = await response.json();
         return res
 
@@ -118,15 +187,16 @@ export function NewWebsite() {
         }
 
         const websiteData = {
-            url: data.url,
-            dbUsername: data.dbUsername,
+            subDomain: data.subDomain,
+            name: data.name,
             dbPassword: data.dbPassword,
             userId: userSession?.userId || user.id
         }
-        const website = await createWebsite(websiteData)
-        if (!website) return
+        const website = await deployWesbite(websiteData)
+        // const website = await createWebsite(websiteData)
+        // if (!website) return
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "done", message: "Votre site a été créé avec succès!"})
+        // setWebsiteCreationProcess({...websiteCreationProcess, status: "done", message: "Votre site a été créé avec succès!"})
         navigate("/dashboard")
     }
 
