@@ -20,7 +20,7 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
             if (userToken && userId) {
                 const getWebsites = async (filters: WebsitesFilters): Promise<Website[]> => {
                     const bearer = "Bearer " + userToken;
-                    const response: Response = await fetch(`${process.env.REACT_APP_API_URL}/websites?userId=${userId}`, {
+                    const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites?userId=${userId}`, {
                         headers: {
                             "Authorization": bearer,
                             "Content-Type": "application/json"

@@ -61,7 +61,7 @@ export function NewWebsite() {
 
     async function createUser(userData: { firstName: string; password: string; surname: string; email: string }) {
 
-        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/users/register", {method: "POST", body: JSON.stringify(userData), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(import.meta.env.VITE_API_URL+"/users/register", {method: "POST", body: JSON.stringify(userData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur lors de la création du compte: " + await error.message);
@@ -73,7 +73,7 @@ export function NewWebsite() {
     }
 
     async function logInUser(email: string, password: string) {
-        const response: Response = await fetch(process.env.REACT_APP_API_URL +"/users/login", {method: "POST", body: JSON.stringify(data), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(import.meta.env.VITE_API_URL +"/users/login", {method: "POST", body: JSON.stringify(data), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur : " + await error.message);
@@ -109,7 +109,7 @@ export function NewWebsite() {
     }
 
     async function deployDomain(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
-        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites/scripts/domain", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(import.meta.env.VITE_API_URL+"/websites/scripts/domain", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
@@ -120,7 +120,7 @@ export function NewWebsite() {
     }
 
     async function deployAPI(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
-        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites/scripts/apiDocker", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(import.meta.env.VITE_API_URL+"/websites/scripts/apiDocker", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
@@ -131,7 +131,7 @@ export function NewWebsite() {
     }
 
 async function deployFront(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
-        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites/scripts/frontDocker", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(import.meta.env.VITE_API_URL+"/websites/scripts/frontDocker", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
@@ -142,7 +142,7 @@ async function deployFront(websiteData: { name: string; userId: number; subDomai
     }
 
     async function deployNGINX(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }){
-        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites/scripts/confNGINX", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(import.meta.env.VITE_API_URL+"/websites/scripts/confNGINX", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
@@ -155,7 +155,7 @@ async function deployFront(websiteData: { name: string; userId: number; subDomai
 
 
     async function createWebsite(websiteData: { dbUsername: string; userId: number; url: string; dbPassword: string }) {
-        const response: Response = await fetch(process.env.REACT_APP_API_URL+"/websites", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
+        const response: Response = await fetch(import.meta.env.VITE_API_URL+"/websites", {method: "POST", body: JSON.stringify(websiteData), headers: {"Content-Type": "application/json"}});
         if (!response.ok) {
             const error =  await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);

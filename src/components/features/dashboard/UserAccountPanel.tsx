@@ -23,7 +23,7 @@ type UserPanelProps = {
 
 async function getUserData(userId: number, userToken: string) {
     const bearer = "Bearer " + userToken;
-    const response: Response = await fetch(`${process.env.REACT_APP_API_URL}/users/${userId}`, {
+    const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
         headers: {
             "Authorization": bearer,
             "Content-Type": "application/json"
@@ -42,7 +42,7 @@ async function getUserData(userId: number, userToken: string) {
 async function updateUser(userId: number | undefined, userToken: string | undefined, data: Partial<FormData>) {
 
     const bearer = "Bearer " + userToken;
-    const response: Response = await fetch(`${process.env.REACT_APP_API_URL}/users/${userId}`, {
+    const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
         method: "PATCH",
         headers: {
             "Authorization": bearer,
