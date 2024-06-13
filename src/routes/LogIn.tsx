@@ -1,8 +1,8 @@
-import {Alert, Button, Link, TextField, useTheme} from "@mui/material";
+import {Alert, Button, Link, Snackbar, TextField, useTheme} from "@mui/material";
 import '../styles/LogIn.css';
 import '../styles/App.css';
 import {FormEvent, useContext, useState} from "react";
-import {redirect, useNavigate} from "react-router-dom";
+import {redirect, useNavigate, useSearchParams} from "react-router-dom";
 import {Dashboard} from "./Dashboard";
 import {UserSessionContext} from "../contexts/user-session";
 
@@ -19,6 +19,8 @@ function LogInForm() {
     let navigate = useNavigate();
     const sessionContext = useContext(UserSessionContext)
 
+    const [queryParameters] = useSearchParams();
+    const [open, setOpen] = useState(queryParameters.get('successMessage') === "true");
     const [ErrorMessage, setErrorMessage] = useState("")
     const [data, setData] = useState(body)
 
@@ -58,9 +60,22 @@ function LogInForm() {
 
                 <div id="form-footer">
                     <Button id="login-button" color="primary" variant="contained" type="submit" disableElevation >Se connecter</Button>
-                    <Link href="/" onClick={handlePasswordChange}>Mot de passe oublié ?</Link>
+                    <Link href="" onClick={handlePasswordChange}>Mot de passe oublié ?</Link>
                     <Link href={"/register"}>Créer un compte ?</Link>
                 </div>
+                <Snackbar
+                    open={open}
+                    autoHideDuration={3000}
+                    onClose={() => setOpen(false)}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    <Alert
+                        onClose={()=> {setOpen(false)}}
+                        severity="success"
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >Le compte a été créé avec succès</Alert>
+                </Snackbar>
 
 
             </form>
