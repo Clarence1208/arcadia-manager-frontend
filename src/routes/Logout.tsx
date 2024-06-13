@@ -1,15 +1,15 @@
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {Home} from "./Home";
 
-export default function Logout(){
+export default function Logout() {
     try {
         localStorage.removeItem("userSession")
         console.log("user session removed")
-    }catch (e){
+    } catch (e) {
         console.error(e)
     }
 
     window.location.href = "/"
-    return <Home />
+    return <Home/>
 
 }
