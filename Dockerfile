@@ -22,8 +22,11 @@ FROM nginx:stable-alpine as production-stage
 # Copiez le build du dossier dist dans le serveur nginx
 COPY --from=build-stage /app/build /usr/share/nginx/html
 
+# Copiez le fichier de configuration nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # Exposez le port 80
-EXPOSE 80
+EXPOSE 8080
 
 # Lancez nginx
 CMD ["nginx", "-g", "daemon off;"]

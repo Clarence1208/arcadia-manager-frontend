@@ -1,11 +1,20 @@
-import {defineConfig, loadEnv} from 'vite';
+import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
+import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
-    base: "https://arcadia-solution.com/",
+    // base: "https://arcadia-solution.com/",
     build: {
         outDir: 'build',
+        rollupOptions: {
+            // Flatten because I had issues with nested folders in nginx
+            output: {
+                entryFileNames: "[name].js",
+                chunkFileNames: "[name].js",
+                assetFileNames: "[name].[ext]",
+            },
+        },
     },
     plugins: [
         react({
@@ -14,7 +23,7 @@ export default defineConfig({
                     plugins: ['@emotion/babel-plugin']
                 }
             }
-        ), viteTsconfigPaths()],
+        ), svgr(), viteTsconfigPaths()],
     server: {
         // this ensures that the browser opens upon server start
         open: false,
