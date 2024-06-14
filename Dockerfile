@@ -20,7 +20,7 @@ RUN npm run build
 FROM nginx:stable-alpine as production-stage
 
 # Copiez le build du dossier dist dans le serveur nginx
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY --from=build-stage /app/build /usr/share/nginx/html
 
 # Exposez le port 80
 EXPOSE 80
