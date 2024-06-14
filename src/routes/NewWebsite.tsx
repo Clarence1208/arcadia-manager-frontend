@@ -109,7 +109,7 @@ export function NewWebsite() {
         // createWebsite(websiteData);
 
         setWebsiteCreationProcess({...websiteCreationProcess, status: "Déploiement du domaine"})
-        await (websiteData);
+        await deployDomain(websiteData);
 
         setWebsiteCreationProcess({...websiteCreationProcess, status: "Déploiement API"})
         await deployAPI(websiteData);

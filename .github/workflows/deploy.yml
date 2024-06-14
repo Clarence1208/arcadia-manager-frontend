@@ -25,5 +25,5 @@ jobs:
           docker build -t arcadia-manager-front . 
           docker stop arcadia-manager-front
           docker rm arcadia-manager-front
-          docker run -d --name arcadia-manager-front -p 8080:8080 -v /root/arcadia-manager-frontend/.env:/app/.env:ro arcadia-manager-front
+          docker run -d --name arcadia-manager-front --restart unless-stopped -p 8080:80 -v /root/arcadia-manager-frontend/.env:/app/.env:ro arcadia-manager-front
           EOF
