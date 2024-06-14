@@ -27,10 +27,3 @@ EXPOSE 80
 
 # Lancez nginx
 CMD ["nginx", "-g", "daemon off;"]
-
-#
-## Expose port 80 to have it mapped by Docker daemon
-#EXPOSE 3000
-#
-## Define the command to run the app
-#CMD ["npm", "start"]

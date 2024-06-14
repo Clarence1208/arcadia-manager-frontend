@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-    base: "https://arcadia-solution.com/",
+    base: "/app/src/rootes",
     build: {
         outDir: 'build',
     },
