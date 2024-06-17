@@ -105,21 +105,22 @@ export function NewWebsite() {
 
     async function deployWesbite(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }) {
 
-        // setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
-        // createWebsite(websiteData);
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Création du site web en cours..."})
+        await createWebsite(websiteData);
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "Déploiement du domaine"})
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Déploiement du domaine en cours..."})
         await deployDomain(websiteData);
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "Déploiement API"})
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Déploiement API en cours..."})
         await deployAPI(websiteData);
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "DÉPLOIEMENT FRONT"})
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Déploiement Front en cours..."})
         await deployFront(websiteData);
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "Début de create"})
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Déploiement NGINX en cours..."})
         await deployNGINX(websiteData);
 
+        setWebsiteCreationProcess({...websiteCreationProcess, status: "done", message: "Votre site a été créé avec succès!"})
         //POTENTIALLY A LAST HEALTH CHECK CALL
 
     }
@@ -185,21 +186,32 @@ export function NewWebsite() {
     }
 
 
-    async function createWebsite(websiteData: { dbUsername: string; userId: number; url: string; dbPassword: string }) {
-        const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites", {
-            method: "POST",
-            body: JSON.stringify(websiteData),
-            headers: {"Content-Type": "application/json"}
-        });
-        if (!response.ok) {
-            const error = await response.json()
-            setErrorMessage("Erreur lors de la création du site web: " + await error.message);
-            setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
-            return
-        }
+    async function createWebsite(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }) {
+        // const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites", {
+        //     method: "POST",
+        //     body: JSON.stringify(websiteData),
+        //     headers: {"Content-Type": "application/json"}
+        // });
+        // if (!response.ok) {
+        //     const error = await response.json()
+        //     setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+        //     setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
+        //     return
+        // }
 
-        const res = await response.json();
-        return res
+        // const res = await response.json();
+        // return res
+
+        //wait for 3 seconds to simulate the creation of the website
+        await new Promise(r => setTimeout(r, 3000))
+
+        return {
+            id: 1,
+            name: "test",
+            subDomain: "test",
+            dbPassword: "test",
+            userId: 1
+        }
 
     }
 
