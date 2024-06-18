@@ -8,8 +8,8 @@ type RecapData = {
     surname: string
     email: string
     password: string
-    subDomain: string,
-    name: string,
+    url: string,
+    dbUsername: string,
     dbPassword: string,
 }
 
@@ -37,8 +37,8 @@ export function RecapForm(props: RecapProps) {
 
                 <div className="form-inputs">
                     <h3>Configuration du site:</h3>
-                    <TextField variant="outlined" label="Website subDomain" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>}} autoFocus required type="text" value={props.subDomain} onChange={e => props.updateFields({ subDomain: e.target.value })} />
-                    <TextField variant="outlined" label="Super Administrator login" required type="text" value={props.name} onChange={e => props.updateFields({name: e.target.value})}/>
+                    <TextField variant="outlined" label="Website subdomain" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>}} autoFocus required type="text" value={props.url} onChange={e => props.updateFields({ url: e.target.value })} />
+                    <TextField variant="outlined" label="Super Administrator login" required type="text" value={props.dbUsername} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
                     <TextField variant="outlined" label="Administrator password" required type="password" value={props.dbPassword} onChange={e => props.updateFields({ dbPassword: e.target.value })} />
                 </div>
             </div>

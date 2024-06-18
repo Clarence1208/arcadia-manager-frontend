@@ -17,19 +17,27 @@ type FormData = {
     surname: string
     email: string
     password: string
-    subDomain: string,
-    name: string,
+    url: string
+    dbUsername: string,
     dbPassword: string,
+}
+
+type WebsiteData = {
+    name: string;
+    userId: number;
+    subDomain: string;
+    dbPassword: string
 }
 const body: FormData = {
     firstName: "",
     surname: "",
     email: "",
     password: "",
-    subDomain: "",
-    name: "",
+    url: "",
+    dbUsername: "",
     dbPassword: ""
 }
+
 
 export function NewWebsite() {
     const navigate = useNavigate()
@@ -103,29 +111,62 @@ export function NewWebsite() {
         }
     }
 
-    async function deployWesbite(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }) {
+    async function deployWesbite(scriptData: WebsiteData, websiteDataDB: Partial<FormData>) {
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Création du site web en cours..."})
-        await createWebsite(websiteData);
+        setWebsiteCreationProcess({
+            ...websiteCreationProcess,
+            status: "loading",
+            message: "Création du site web en cours..."
+        })
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Déploiement du domaine en cours..."})
-        await deployDomain(websiteData);
+        const website = await createWebsite(websiteDataDB);
+        await new Promise(r => setTimeout(r, 1000))
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Déploiement API en cours..."})
-        await deployAPI(websiteData);
+        setWebsiteCreationProcess({
+            ...websiteCreationProcess,
+            status: "loading",
+            message: "Déploiement du domaine en cours..."
+        })
+        await deployDomain(scriptData);
+        await new Promise(r => setTimeout(r, 1000))
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Déploiement Front en cours..."})
-        await deployFront(websiteData);
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "loading", message: "Déploiement NGINX en cours..."})
-        await deployNGINX(websiteData);
+        setWebsiteCreationProcess({
+            ...websiteCreationProcess,
+            status: "loading",
+            message: "Déploiement API en cours..."
+        })
+        await deployAPI(scriptData);
+        await new Promise(r => setTimeout(r, 1000))
 
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "done", message: "Votre site a été créé avec succès!"})
-        //POTENTIALLY A LAST HEALTH CHECK CALL
+        setWebsiteCreationProcess({
+            ...websiteCreationProcess,
+            status: "loading",
+            message: "Déploiement Front en cours..."
+        })
+        await deployFront(scriptData);
+        await new Promise(r => setTimeout(r, 1000))
 
+        setWebsiteCreationProcess({
+            ...websiteCreationProcess,
+            status: "loading",
+            message: "Déploiement NGINX en cours..."
+        })
+        await deployNGINX(scriptData);
+        //wait a bit
+        await new Promise(r => setTimeout(r, 2000))
+
+
+        setWebsiteCreationProcess({
+            ...websiteCreationProcess,
+            status: "done",
+            message: "Votre site a été créé avec succès!"
+        })
+        //POTENTIALLY A LAST HEALTH CHECK CALL AND INSERTING DATA INTO DATABASE
+        return website;
     }
 
-    async function deployDomain(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }) {
+    async function deployDomain(websiteData: WebsiteData) {
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites/scripts/domain", {
             method: "POST",
             body: JSON.stringify(websiteData),
@@ -140,7 +181,7 @@ export function NewWebsite() {
         return await response.json();
     }
 
-    async function deployAPI(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }) {
+    async function deployAPI(websiteData: WebsiteData) {
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites/scripts/apiDocker", {
             method: "POST",
             body: JSON.stringify(websiteData),
@@ -155,7 +196,7 @@ export function NewWebsite() {
         return await response.json();
     }
 
-    async function deployFront(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }) {
+    async function deployFront(websiteData: WebsiteData) {
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites/scripts/frontDocker", {
             method: "POST",
             body: JSON.stringify(websiteData),
@@ -170,7 +211,7 @@ export function NewWebsite() {
         return await response.json();
     }
 
-    async function deployNGINX(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }) {
+    async function deployNGINX(websiteData: WebsiteData) {
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites/scripts/confNGINX", {
             method: "POST",
             body: JSON.stringify(websiteData),
@@ -186,73 +227,92 @@ export function NewWebsite() {
     }
 
 
-    async function createWebsite(websiteData: { name: string; userId: number; subDomain: string; dbPassword: string }) {
-        // const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites", {
-        //     method: "POST",
-        //     body: JSON.stringify(websiteData),
-        //     headers: {"Content-Type": "application/json"}
-        // });
-        // if (!response.ok) {
-        //     const error = await response.json()
-        //     setErrorMessage("Erreur lors de la création du site web: " + await error.message);
-        //     setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
-        //     return
-        // }
-
-        // const res = await response.json();
-        // return res
-
-        //wait for 3 seconds to simulate the creation of the website
-        await new Promise(r => setTimeout(r, 3000))
-
-        return {
-            id: 1,
-            name: "test",
-            subDomain: "test",
-            dbPassword: "test",
-            userId: 1
+    async function createWebsite(websiteData: Partial<FormData>) {
+        const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites", {
+            method: "POST",
+            body: JSON.stringify(websiteData),
+            headers: {"Content-Type": "application/json"}
+        });
+        if (!response.ok) {
+            const error = await response.json()
+            setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
+            return
         }
 
+        const res = await response.json();
+        return res
     }
 
     async function onSubmit(e: FormEvent) {
         e.preventDefault()
         if (!isLastStep) return next()
 
-        let user;
+        let userID;
         setWebsiteCreationProcess({...websiteCreationProcess, status: "Starting process"})
-        /*if (!userSession?.isLoggedIn) {
+        if (!userSession?.isLoggedIn) {
             const userData = {
                 firstName: data.firstName,
                 surname: data.surname,
                 email: data.email,
                 password: data.password
             }
-            user = await createUser(userData)
+            const user = await createUser(userData)
             if (!user) return
+            userID = user.id
             setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
-        }*/
-
-        const websiteData = {
-            subDomain: data.subDomain,
-            name: data.name,
-            dbPassword: data.dbPassword,
-            userId: userSession?.userId || 1
+            await logInUser(data.email, data.password);
         }
-        const website = await deployWesbite(websiteData)
-        // const website = await createWebsite(websiteData)
-        // if (!website) return
+        else {
+            userID = userSession?.userId
+        }
 
-        // setWebsiteCreationProcess({...websiteCreationProcess, status: "done", message: "Votre site a été créé avec succès!"})
+        const scriptData :WebsiteData = {
+            subDomain: data.url,
+            name: data.dbUsername,
+            dbPassword: data.dbPassword,
+            userId: userID
+        }
+        const websiteDataDB = {
+            url: data.url,
+            dbUsername: data.dbUsername,
+            dbPassword: data.dbPassword,
+            userId: userID
+        }
+        const website = await deployWesbite(scriptData,websiteDataDB)
+        if (!website) return
+
+        //wait a bit before redirecting
+        await new Promise(r => setTimeout(r, 2000))
+
         navigate("/dashboard")
+    }
+
+    if (websiteCreationProcess.status === "loading") {
+        return <LoadingSpinner message={websiteCreationProcess.message}/>
+    }
+    if (websiteCreationProcess.status === "done") {
+        return (
+            <div>
+                <Header/>
+                <div className={"main"}>
+                        <div style={{position: "absolute", top: ".5rem", right: ".5rem"}}>
+                            Etape {currentStepIndex + 1} / {steps.length}
+                        </div>
+                        <Collapse in={open}>
+                            <Alert severity="success" onClose={() => setOpen(false)}>
+                                {websiteCreationProcess.message}
+                            </Alert>
+                        </Collapse>
+                </div>
+                <Footer/>
+            </div>
+        )
     }
 
     return (
         <div>
             <Header/>
-            {websiteCreationProcess.status === "loading" && <LoadingSpinner message={websiteCreationProcess.message}/>}
-            {websiteCreationProcess.status === "done" && <Collapse in={open}><Alert severity={"success"}
-                                                                                    onClose={() => setOpen(false)}>{websiteCreationProcess.message}</Alert></Collapse>}
             <div id={"create-website-page"}>
                 <div style={{display: "flex", justifyContent: "center"}}>
                     <div style={{
