@@ -17,16 +17,19 @@ type FormData = {
     surname: string
     email: string
     password: string
+    confirmPassword?: string
     url: string
     dbUsername: string,
     dbPassword: string,
+    associationName: string;
 }
 
 type WebsiteData = {
     name: string;
     userId: number;
     subDomain: string;
-    dbPassword: string
+    dbPassword: string;
+    associationName: string;
 }
 const body: FormData = {
     firstName: "",
@@ -35,7 +38,8 @@ const body: FormData = {
     password: "",
     url: "",
     dbUsername: "",
-    dbPassword: ""
+    dbPassword: "",
+    associationName: ""
 }
 
 
@@ -73,8 +77,12 @@ export function NewWebsite() {
     const {steps, currentStepIndex, step, isFirstStep, isLastStep, back, next} = useMultiStepForm(forms)
 
 
-    async function createUser(userData: { firstName: string; password: string; surname: string; email: string }) {
-
+    async function createUser(userData:Partial<FormData>) {
+        if (userData.password !== userData.confirmPassword) {
+            setErrorMessage("Les mots de passe ne correspondent pas");
+            return
+        }
+        delete userData.confirmPassword;
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/users/register", {
             method: "POST",
             body: JSON.stringify(userData),
@@ -162,7 +170,7 @@ export function NewWebsite() {
             status: "done",
             message: "Votre site a été créé avec succès!"
         })
-        //POTENTIALLY A LAST HEALTH CHECK CALL AND INSERTING DATA INTO DATABASE
+        //POTENTIALLY A LAST HEALTH CHECK CALL AND A ROLLBACK IF ERROR
         return website;
     }
 
@@ -271,7 +279,8 @@ export function NewWebsite() {
             subDomain: data.url,
             name: data.dbUsername,
             dbPassword: data.dbPassword,
-            userId: userID
+            userId: userID,
+            associationName: data.associationName
         }
         const websiteDataDB = {
             url: data.url,

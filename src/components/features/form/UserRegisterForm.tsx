@@ -11,6 +11,7 @@ type UserData = {
     surname: string
     email: string
     password: string,
+    confirmPassword?: string,
 }
 
 type UserFormProps = UserData & {
@@ -41,7 +42,7 @@ export function UserRegisterForm(props: UserFormProps) {
                 <TextField variant="outlined" label="Surname" required type="text" value={props.surname} onChange={e => props.updateFields({ surname: e.target.value })} />
                 <TextField variant="outlined" label="Email" required type="email" value={props.email} onChange={e => props.updateFields({email: e.target.value})}/>
                 <TextField variant="outlined" label="Password" required type="password" value={props.password} onChange={e => props.updateFields({password: e.target.value})}/>
-                <TextField variant="outlined" label="Confirm password" required type="password" value={props.password} onChange={e => props.updateFields({password: e.target.value})}/>
+                <TextField variant="outlined" label="Confirm password" required type="password" value={props.confirmPassword} onChange={e => props.updateFields({confirmPassword: e.target.value})}/>
 
             </div>
         </div>

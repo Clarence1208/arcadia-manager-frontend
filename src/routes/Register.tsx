@@ -10,6 +10,7 @@ type FormData = {
     surname: string
     email: string
     password: string,
+    confirmPassword?: string,
 }
 
 const body: FormData = {
@@ -32,6 +33,13 @@ export function Register() {
     }
 
     async function handleSubmit() {
+
+        if (data.password !== data.confirmPassword) {
+            setErrorMessage("Les mots de passe ne correspondent pas");
+            return
+        }
+
+        delete data.confirmPassword;
 
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/users/register", {
             method: "POST",
