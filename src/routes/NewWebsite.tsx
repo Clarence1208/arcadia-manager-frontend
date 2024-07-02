@@ -338,7 +338,10 @@ export function NewWebsite() {
         const website = await deployWesbite(scriptData,websiteDataDB)
         if (!website) return
 
-        uploadLogo();
+        if (data.associationName !== "" && fileRef.current) {
+            uploadLogo();
+
+        }
 
         await new Promise(r => setTimeout(r, 2000))
 
