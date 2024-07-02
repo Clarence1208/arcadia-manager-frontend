@@ -11,7 +11,7 @@ import {Alert, Button} from "@mui/material";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {UserSessionContext} from "../contexts/user-session";
 import {useNavigate} from "react-router-dom";
-type ReactS3ClientType = typeof import('react-aws-s3-typescript').default;
+// type ReactS3ClientType = typeof import('react-aws-s3-typescript').default;
 
 type FormData = {
     firstName: string
@@ -44,13 +44,13 @@ const body: FormData = {
     associationName: ""
 }
 
-const s3Config = {
-    bucketName: 'arcadia-bucket',
-    dirName: "" || "",
-    region: 'eu-west-3',
-    accessKeyId: import.meta.env.VITE_ACCESS_KEY_ID || "",
-    secretAccessKey: import.meta.env.VITE_SECRET_ACCESS_KEY || "",
-};
+// const s3Config = {
+//     bucketName: 'arcadia-bucket',
+//     dirName: "" || "",
+//     region: 'eu-west-3',
+//     accessKeyId: import.meta.env.VITE_ACCESS_KEY_ID || "",
+//     secretAccessKey: import.meta.env.VITE_SECRET_ACCESS_KEY || "",
+// };
 
 
 export function NewWebsite() {
@@ -65,29 +65,29 @@ export function NewWebsite() {
         message: "Création du compte Arcadia en cours..."
     })
     const fileRef = useRef<File | null>(null);
-    const [ReactS3Client, setReactS3Client] = useState<ReactS3ClientType | null>(null);
+    // const [ReactS3Client, setReactS3Client] = useState<ReactS3ClientType | null>(null);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            console.log('File details:', {
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                lastModified: file.lastModified,
-            });
-            fileRef.current = file;
-            console.log('File reference:', fileRef.current);
-        }
-    };
+    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = event.target.files?.[0];
+    //     if (file) {
+    //         console.log('File details:', {
+    //             name: file.name,
+    //             size: file.size,
+    //             type: file.type,
+    //             lastModified: file.lastModified,
+    //         });
+    //         fileRef.current = file;
+    //         console.log('File reference:', fileRef.current);
+    //     }
+    // };
 
-    useEffect(() => {
-        const loadModule = async () => {
-          const module = await import('react-aws-s3-typescript');
-          setReactS3Client(module.default);
-        };
-        loadModule();
-      }, []);
+    // useEffect(() => {
+    //     const loadModule = async () => {
+    //       const module = await import('react-aws-s3-typescript');
+    //       setReactS3Client(module.default);
+    //     };
+    //     loadModule();
+    //   }, []);
 
     function updateFields(fields: Partial<FormData>) {
         setData(prev => {
@@ -100,8 +100,8 @@ export function NewWebsite() {
         <UserRegisterForm {...data} updateFields={updateFields} formError={errorMessage}
                           formTitle="Créer un compte Arcadia"
                           formDescription="Sur votre compte Arcadia, vous retrouverez vos sites, vos paiements et vos informations personnelles."/>,
-        <WebsiteForm {...data} updateFields={updateFields} handleFileChange={handleFileChange} formError={errorMessage} formTitle="Créer un site internet"
-                     formDescription="Ces informations seront utilisées pour configurer votre site."/>,
+        // <WebsiteForm {...data} updateFields={updateFields} handleFileChange={handleFileChange} formError={errorMessage} formTitle="Créer un site internet"
+        //              formDescription="Ces informations seront utilisées pour configurer votre site."/>,
         <RecapForm {...data} updateFields={updateFields} formError={errorMessage} formTitle="Récapitulatif des données"
                    formDescription="Attention certaines informations ne pourront pas être modifiées ultèrieurement."/>
     ]
@@ -302,16 +302,16 @@ export function NewWebsite() {
             return;
         }
 
-        if (!ReactS3Client) {
-            setErrorMessage("ReactS3Client not loaded.");
-            setOpen(true);
-            return;
-        }
-
-        const s3 = new ReactS3Client({
-            ...s3Config,
-            dirName: data.associationName + "/common/logo-" + fileRef.current.name,
-        });
+        // if (!ReactS3Client) {
+        //     setErrorMessage("ReactS3Client not loaded.");
+        //     setOpen(true);
+        //     return;
+        // }
+        //
+        // const s3 = new ReactS3Client({
+        //     ...s3Config,
+        //     dirName: data.associationName + "/common/logo-" + fileRef.current.name,
+        // });
         let filename = fileRef.current.name;
         let parts = filename.split('.');
         if (parts.length > 1) {
@@ -320,7 +320,7 @@ export function NewWebsite() {
         let nameWithoutExtension = parts.join('.');
 
         try {
-            await s3.uploadFile(fileRef.current, nameWithoutExtension);
+            // await s3.uploadFile(fileRef.current, nameWithoutExtension);
             setErrorMessage("Fichier chargé avec succès.");
             setOpen(true);
         } catch (error) {
