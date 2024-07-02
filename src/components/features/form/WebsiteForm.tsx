@@ -26,7 +26,8 @@ type WebsiteFormProps = WebsiteData & {
     formTitle: string,
     formDescription: string,
     formError: string,
-    updateFields: (fields: Partial<WebsiteData>) => void
+    updateFields: (fields: Partial<WebsiteData>) => void,
+    handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export function WebsiteForm(props: WebsiteFormProps) {
@@ -37,7 +38,7 @@ export function WebsiteForm(props: WebsiteFormProps) {
             {props.formError && <Alert className={"alert"} severity="error" onClose={() => {}}>{props.formError} </Alert>}
             <div className="form-inputs">
                 <TextField variant="outlined" label="URL du site" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>,}} autoFocus required type="text" value={props.url} onChange={e => props.updateFields({ url: e.target.value })} />
-                <TextField variant="outlined" label="Nom de l'association" required type="text" value={props.associationName} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
+                <TextField variant="outlined" label="Nom de l'association" required type="text" value={props.associationName} onChange={e => props.updateFields({associationName: e.target.value})}/>
                 <Button
                     component="label"
                     role="button"
@@ -48,11 +49,11 @@ export function WebsiteForm(props: WebsiteFormProps) {
                     Charger un logo
                     <VisuallyHiddenInput
                         type="file"
-                        onChange={()=> alert("")}
+                        onChange={props.handleFileChange}
                     />
                 </Button>
                 <TextField variant="outlined" label="Email de l'administrateur par défaut" required type="text" value={props.dbUsername} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
-                <TextField variant="outlined" label="Mot de passe de l'administrateur" required type="password" value={props.dbPassword} onChange={e => props.updateFields({ dbPassword: e.target.value })} />
+                <TextField variant="outlined" label="Mot de passe de l'administrateur" required type="password" value={props.dbPassword} onChange={e => props.updateFields({dbPassword: e.target.value})} />
 
             </div>
         </div>

@@ -1,4 +1,4 @@
-import {FormEvent, useContext, useState} from "react";
+import {FormEvent, useContext, useRef, useState} from "react";
 import {useMultiStepForm} from "../components/features/useMultipleStepForm";
 import {UserRegisterForm} from "../components/features/form/UserRegisterForm";
 import {WebsiteForm} from "../components/features/form/WebsiteForm";
@@ -11,6 +11,8 @@ import {Alert, Button} from "@mui/material";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {UserSessionContext} from "../contexts/user-session";
 import {useNavigate} from "react-router-dom";
+import ReactS3Client from 'react-aws-s3-typescript';
+import {s3Config} from './../utils/s3Config';
 
 type FormData = {
     firstName: string
@@ -54,6 +56,21 @@ export function NewWebsite() {
         status: "idle",
         message: "Création du compte Arcadia en cours..."
     })
+    const fileRef = useRef<File | null>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            console.log('File details:', {
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                lastModified: file.lastModified,
+            });
+            fileRef.current = file;
+            console.log('File reference:', fileRef.current);
+        }
+    };
 
     function updateFields(fields: Partial<FormData>) {
         setData(prev => {
@@ -66,7 +83,7 @@ export function NewWebsite() {
         <UserRegisterForm {...data} updateFields={updateFields} formError={errorMessage}
                           formTitle="Créer un compte Arcadia"
                           formDescription="Sur votre compte Arcadia, vous retrouverez vos sites, vos paiements et vos informations personnelles."/>,
-        <WebsiteForm {...data} updateFields={updateFields} formError={errorMessage} formTitle="Créer un site internet"
+        <WebsiteForm {...data} updateFields={updateFields} handleFileChange={handleFileChange} formError={errorMessage} formTitle="Créer un site internet"
                      formDescription="Ces informations seront utilisées pour configurer votre site."/>,
         <RecapForm {...data} updateFields={updateFields} formError={errorMessage} formTitle="Récapitulatif des données"
                    formDescription="Attention certaines informations ne pourront pas être modifiées ultèrieurement."/>
@@ -252,6 +269,36 @@ export function NewWebsite() {
         return res
     }
 
+    const uploadLogo = async () => {
+
+        if (!fileRef.current) {
+            setErrorMessage("No file selected.");
+            setOpen(true);
+            return;
+        }
+
+        const s3 = new ReactS3Client({
+            ...s3Config,
+            dirName: data.associationName + "/common/logo-" + fileRef.current.name,
+        });
+        let filename = fileRef.current.name;
+        let parts = filename.split('.');
+        if (parts.length > 1) {
+            parts.pop();
+        }
+        let nameWithoutExtension = parts.join('.');
+
+        try {
+            await s3.uploadFile(fileRef.current, nameWithoutExtension);
+            setErrorMessage("Fichier chargé avec succès.");
+            setOpen(true);
+        } catch (error) {
+            console.error('Upload error:', error);
+            setErrorMessage("Erreur : " + error);
+            setOpen(true);
+        }
+    };
+
     async function onSubmit(e: FormEvent) {
         e.preventDefault()
         if (!isLastStep) return next()
@@ -291,7 +338,11 @@ export function NewWebsite() {
         const website = await deployWesbite(scriptData,websiteDataDB)
         if (!website) return
 
-        //wait a bit before redirecting
+        if (data.associationName !== "" && fileRef.current) {
+            uploadLogo();
+
+        }
+
         await new Promise(r => setTimeout(r, 2000))
 
         navigate("/dashboard")
