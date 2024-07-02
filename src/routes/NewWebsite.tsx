@@ -1,4 +1,4 @@
-import {FormEvent, useContext, useRef, useState} from "react";
+import {FormEvent, useContext, useEffect, useRef, useState} from "react";
 import {useMultiStepForm} from "../components/features/useMultipleStepForm";
 import {UserRegisterForm} from "../components/features/form/UserRegisterForm";
 import {WebsiteForm} from "../components/features/form/WebsiteForm";
@@ -11,8 +11,7 @@ import {Alert, Button} from "@mui/material";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {UserSessionContext} from "../contexts/user-session";
 import {useNavigate} from "react-router-dom";
-import ReactS3Client from 'react-aws-s3-typescript';
-import {s3Config} from './../utils/s3Config';
+type ReactS3ClientType = typeof import('react-aws-s3-typescript').default;
 
 type FormData = {
     firstName: string
@@ -44,6 +43,14 @@ const body: FormData = {
     associationName: ""
 }
 
+const s3Config = {
+    bucketName: 'arcadia-bucket',
+    dirName: "" || "",
+    region: 'eu-west-3',
+    accessKeyId: import.meta.env.VITE_ACCESS_KEY_ID || "",
+    secretAccessKey: import.meta.env.VITE_SECRET_ACCESS_KEY || "",
+};
+
 
 export function NewWebsite() {
     const navigate = useNavigate()
@@ -57,6 +64,7 @@ export function NewWebsite() {
         message: "Création du compte Arcadia en cours..."
     })
     const fileRef = useRef<File | null>(null);
+    const [ReactS3Client, setReactS3Client] = useState<ReactS3ClientType | null>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -71,6 +79,14 @@ export function NewWebsite() {
             console.log('File reference:', fileRef.current);
         }
     };
+
+    useEffect(() => {
+        const loadModule = async () => {
+          const module = await import('react-aws-s3-typescript');
+          setReactS3Client(module.default);
+        };
+        loadModule();
+      }, []);
 
     function updateFields(fields: Partial<FormData>) {
         setData(prev => {
@@ -270,9 +286,14 @@ export function NewWebsite() {
     }
 
     const uploadLogo = async () => {
-
         if (!fileRef.current) {
             setErrorMessage("No file selected.");
+            setOpen(true);
+            return;
+        }
+
+        if (!ReactS3Client) {
+            setErrorMessage("ReactS3Client not loaded.");
             setOpen(true);
             return;
         }
