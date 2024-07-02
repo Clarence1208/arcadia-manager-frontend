@@ -18,7 +18,7 @@ type FormData = {
     surname: string
     email: string
     password: string
-    confirmPassword?: string
+    confirmPassword: string
     url: string
     dbUsername: string,
     dbPassword: string,
@@ -37,6 +37,7 @@ const body: FormData = {
     surname: "",
     email: "",
     password: "",
+    confirmPassword: "",
     url: "",
     dbUsername: "",
     dbPassword: "",
@@ -331,7 +332,8 @@ export function NewWebsite() {
                 firstName: data.firstName,
                 surname: data.surname,
                 email: data.email,
-                password: data.password
+                password: data.password,
+                confirmPassword: data.confirmPassword
             }
             const user = await createUser(userData)
             if (!user) return
