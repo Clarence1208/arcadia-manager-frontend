@@ -11,7 +11,7 @@ import {Alert, Button} from "@mui/material";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {UserSessionContext} from "../contexts/user-session";
 import {useNavigate} from "react-router-dom";
-// type ReactS3ClientType = typeof import('react-aws-s3-typescript').default;
+import { uploadToS3 } from "../utils/s3";
 
 type FormData = {
     firstName: string
@@ -44,15 +44,6 @@ const body: FormData = {
     associationName: ""
 }
 
-// const s3Config = {
-//     bucketName: 'arcadia-bucket',
-//     dirName: "" || "",
-//     region: 'eu-west-3',
-//     accessKeyId: import.meta.env.VITE_ACCESS_KEY_ID || "",
-//     secretAccessKey: import.meta.env.VITE_SECRET_ACCESS_KEY || "",
-// };
-
-
 export function NewWebsite() {
     const navigate = useNavigate()
     const userSessionContext = useContext(UserSessionContext)
@@ -65,29 +56,20 @@ export function NewWebsite() {
         message: "Création du compte Arcadia en cours..."
     })
     const fileRef = useRef<File | null>(null);
-    // const [ReactS3Client, setReactS3Client] = useState<ReactS3ClientType | null>(null);
 
-    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const file = event.target.files?.[0];
-    //     if (file) {
-    //         console.log('File details:', {
-    //             name: file.name,
-    //             size: file.size,
-    //             type: file.type,
-    //             lastModified: file.lastModified,
-    //         });
-    //         fileRef.current = file;
-    //         console.log('File reference:', fileRef.current);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     const loadModule = async () => {
-    //       const module = await import('react-aws-s3-typescript');
-    //       setReactS3Client(module.default);
-    //     };
-    //     loadModule();
-    //   }, []);
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            console.log('File details:', {
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                lastModified: file.lastModified,
+            });
+            fileRef.current = file;
+            console.log('File reference:', fileRef.current);
+        }
+    };
 
     function updateFields(fields: Partial<FormData>) {
         setData(prev => {
@@ -100,8 +82,8 @@ export function NewWebsite() {
         <UserRegisterForm {...data} updateFields={updateFields} formError={errorMessage}
                           formTitle="Créer un compte Arcadia"
                           formDescription="Sur votre compte Arcadia, vous retrouverez vos sites, vos paiements et vos informations personnelles."/>,
-        // <WebsiteForm {...data} updateFields={updateFields} handleFileChange={handleFileChange} formError={errorMessage} formTitle="Créer un site internet"
-        //              formDescription="Ces informations seront utilisées pour configurer votre site."/>,
+        <WebsiteForm {...data} updateFields={updateFields} handleFileChange={handleFileChange} formError={errorMessage} formTitle="Créer un site internet"
+                     formDescription="Ces informations seront utilisées pour configurer votre site."/>,
         <RecapForm {...data} updateFields={updateFields} formError={errorMessage} formTitle="Récapitulatif des données"
                    formDescription="Attention certaines informations ne pourront pas être modifiées ultèrieurement."/>
     ]
@@ -296,36 +278,12 @@ export function NewWebsite() {
     }
 
     const uploadLogo = async () => {
-        if (!fileRef.current) {
-            setErrorMessage("No file selected.");
-            setOpen(true);
-            return;
-        }
-
-        // if (!ReactS3Client) {
-        //     setErrorMessage("ReactS3Client not loaded.");
-        //     setOpen(true);
-        //     return;
-        // }
-        //
-        // const s3 = new ReactS3Client({
-        //     ...s3Config,
-        //     dirName: data.associationName + "/common/logo-" + fileRef.current.name,
-        // });
-        let filename = fileRef.current.name;
-        let parts = filename.split('.');
-        if (parts.length > 1) {
-            parts.pop();
-        }
-        let nameWithoutExtension = parts.join('.');
-
+        const key = data.associationName + "/common/logo-" + fileRef.current?.name;
         try {
-            // await s3.uploadFile(fileRef.current, nameWithoutExtension);
-            setErrorMessage("Fichier chargé avec succès.");
-            setOpen(true);
+            await uploadToS3(fileRef.current!, key);
         } catch (error) {
-            console.error('Upload error:', error);
-            setErrorMessage("Erreur : " + error);
+            console.error("Error uploading logo: ", error);
+            setErrorMessage("Erreur lors du chargement du logo: " + error);
             setOpen(true);
         }
     };
