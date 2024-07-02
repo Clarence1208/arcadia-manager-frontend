@@ -38,11 +38,11 @@ export function UserRegisterForm(props: UserFormProps) {
             <p>{props.formDescription}</p>
             {props.formError && <Collapse in={open}><Alert className="alert" onClose={() => setOpen(false)} severity="error">{props.formError}</Alert></Collapse>}
             <div className="form-inputs">
-                <TextField color="primary" variant="outlined" label="First name" autoFocus required type="text" value={props.firstName} onChange={e => props.updateFields({ firstName: e.target.value })} />
-                <TextField variant="outlined" label="Surname" required type="text" value={props.surname} onChange={e => props.updateFields({ surname: e.target.value })} />
-                <TextField variant="outlined" label="Email" required type="email" value={props.email} onChange={e => props.updateFields({email: e.target.value})}/>
-                <TextField variant="outlined" label="Password" required type="password" value={props.password} onChange={e => props.updateFields({password: e.target.value})}/>
-                <TextField variant="outlined" label="Confirm password" required type="password" value={props.confirmPassword} onChange={e => props.updateFields({confirmPassword: e.target.value})}/>
+                <TextField color="primary" variant="outlined" label="Prénom" autoFocus required type="text" value={props.firstName} onChange={e => props.updateFields({ firstName: e.target.value })} />
+                <TextField variant="outlined" label="Nom de famille" required type="text" value={props.surname} onChange={e => props.updateFields({ surname: e.target.value })} />
+                <TextField variant="outlined" label="E-mail" required type="email" value={props.email} onChange={e => props.updateFields({email: e.target.value})}/>
+                <TextField variant="outlined" label="Mot de passe" required type="password" value={props.password} onChange={e => props.updateFields({password: e.target.value})}/>
+                <TextField variant="outlined" label="Confirmer votre mot de passe" required type="password" value={props.confirmPassword} onChange={e => props.updateFields({confirmPassword: e.target.value})}/>
 
             </div>
         </div>

@@ -178,7 +178,7 @@ export function NewWebsite() {
             status: "loading",
             message: "Déploiement API en cours..."
         })
-        await deployAPI(scriptData);
+        await deployAPI(scriptData, websiteDataDB);
         await new Promise(r => setTimeout(r, 1000))
 
         setWebsiteCreationProcess({
@@ -223,10 +223,19 @@ export function NewWebsite() {
         return await response.json();
     }
 
-    async function deployAPI(websiteData: WebsiteData) {
+    async function deployAPI(websiteData: WebsiteData, otherData: Partial<FormData>) {
+
+        const userData = {
+            adminEmail: otherData.dbUsername,
+            firstName: otherData.firstName,
+            surname: otherData.surname,
+        }
+        const data = {...websiteData, ...userData}
+        console.log(data)
+
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites/scripts/apiDocker", {
             method: "POST",
-            body: JSON.stringify(websiteData),
+            body: JSON.stringify(data),
             headers: {"Content-Type": "application/json"}
         });
         if (!response.ok) {
