@@ -26,7 +26,8 @@ type WebsiteFormProps = WebsiteData & {
     formTitle: string,
     formDescription: string,
     formError: string,
-    updateFields: (fields: Partial<WebsiteData>) => void
+    updateFields: (fields: Partial<WebsiteData>) => void,
+    handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export function WebsiteForm(props: WebsiteFormProps) {
@@ -48,7 +49,7 @@ export function WebsiteForm(props: WebsiteFormProps) {
                     Charger un logo
                     <VisuallyHiddenInput
                         type="file"
-                        onChange={()=> alert("")}
+                        onChange={props.handleFileChange}
                     />
                 </Button>
                 <TextField variant="outlined" label="Email de l'administrateur par défaut" required type="text" value={props.dbUsername} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
