@@ -12,6 +12,7 @@ type RecapData = {
     url: string,
     dbUsername: string,
     dbPassword: string,
+    associationName: string
 }
 
 type RecapProps = RecapData & {
@@ -40,6 +41,7 @@ export function RecapForm(props: RecapProps) {
                 <div className="form-inputs">
                     <h3>Configuration du site:</h3>
                     <TextField variant="outlined" label="URL du site" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>}} autoFocus required type="text" value={props.url} onChange={e => props.updateFields({ url: e.target.value })} />
+                    <TextField variant="outlined" label="Nom de l'association" required type="text" value={props.associationName} onChange={e => props.updateFields({ associationName: e.target.value })} />
                     <TextField variant="outlined" label="E-mail de l'administrateur" required type="text" value={props.dbUsername} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
                     <TextField variant="outlined" label="Mot de passe de l'administrateur" required type="password" value={props.dbPassword} onChange={e => props.updateFields({ dbPassword: e.target.value })} />
                 </div>

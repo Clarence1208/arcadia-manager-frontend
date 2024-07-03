@@ -12,6 +12,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import {UserSessionContext} from "../contexts/user-session";
 import {useNavigate} from "react-router-dom";
 import { uploadToS3 } from "../utils/s3";
+import Logo from '../images/logo-green.svg';
 
 type FormData = {
     firstName: string
@@ -288,49 +289,58 @@ export function NewWebsite() {
         }
     };
 
+    const fetchLogoFile = async (): Promise<File> => {
+        const response = await fetch(Logo);
+        const blob = await response.blob();
+        const file = new File([blob], 'logo-green.svg', { type: blob.type });
+        return file;
+      };
+
     async function onSubmit(e: FormEvent) {
         e.preventDefault()
         if (!isLastStep) return next()
 
-        let userID;
-        setWebsiteCreationProcess({...websiteCreationProcess, status: "Starting process"})
-        if (!userSession?.isLoggedIn) {
-            const userData = {
-                firstName: data.firstName,
-                surname: data.surname,
-                email: data.email,
-                password: data.password,
-                confirmPassword: data.confirmPassword
-            }
-            const user = await createUser(userData)
-            if (!user) return
-            userID = user.id
-            setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
-            await logInUser(data.email, data.password);
-        }
-        else {
-            userID = userSession?.userId
-        }
+        // let userID;
+        // setWebsiteCreationProcess({...websiteCreationProcess, status: "Starting process"})
+        // if (!userSession?.isLoggedIn) {
+        //     const userData = {
+        //         firstName: data.firstName,
+        //         surname: data.surname,
+        //         email: data.email,
+        //         password: data.password,
+        //         confirmPassword: data.confirmPassword
+        //     }
+        //     const user = await createUser(userData)
+        //     if (!user) return
+        //     userID = user.id
+        //     setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
+        //     await logInUser(data.email, data.password);
+        // }
+        // else {
+        //     userID = userSession?.userId
+        // }
 
-        const scriptData :WebsiteData = {
-            subDomain: data.url,
-            name: data.dbUsername,
-            dbPassword: data.dbPassword,
-            userId: userID,
-            associationName: data.associationName
-        }
-        const websiteDataDB = {
-            url: data.url,
-            dbUsername: data.dbUsername,
-            dbPassword: data.dbPassword,
-            userId: userID
-        }
-        const website = await deployWesbite(scriptData,websiteDataDB)
-        if (!website) return
+        // const scriptData :WebsiteData = {
+        //     subDomain: data.url,
+        //     name: data.dbUsername,
+        //     dbPassword: data.dbPassword,
+        //     userId: userID,
+        //     associationName: data.associationName
+        // }
+        // const websiteDataDB = {
+        //     url: data.url,
+        //     dbUsername: data.dbUsername,
+        //     dbPassword: data.dbPassword,
+        //     userId: userID
+        // }
+        // const website = await deployWesbite(scriptData,websiteDataDB)
+        // if (!website) return
 
-        if (data.associationName !== "" && fileRef.current) {
+        if (fileRef.current) {
             uploadLogo();
-
+        } else {
+            fileRef.current = await fetchLogoFile();
+            uploadLogo();
         }
 
         await new Promise(r => setTimeout(r, 2000))
