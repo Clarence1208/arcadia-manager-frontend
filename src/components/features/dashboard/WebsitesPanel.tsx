@@ -3,6 +3,7 @@ import {AddCircleOutline, Delete, Edit} from "@mui/icons-material";
 import {Alert, Button, Link, Modal, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import { listFilesS3 } from "../../../utils/s3";
 import { _Object } from "@aws-sdk/client-s3";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 type Website = {
     id: number;
@@ -21,6 +22,14 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     const [open, setOpen] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [logo, setLogo] = useState<string>("");
+    const [websiteLoaded, setWebsiteLoaded] = useState<boolean>(false);
+    const [isPageLoaded, setIsPageLoaded] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setIsPageLoaded(true);
+        }, 100);
+    }, []);
 
     useEffect(() => {
             if (userToken && userId) {
@@ -44,7 +53,7 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                     }
                     return res;
                 }
-                getWebsites({userId: userId}).then(setWebsites)
+                getWebsites({userId: userId}).then(setWebsites).then(() => setWebsiteLoaded(true));
             }
         }
     , [userToken, userId])
@@ -54,22 +63,25 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
         const fetchData = async () => {
             try {
                 const fileList = await listFilesS3();
-                fileList?.Contents?.forEach((value: _Object, index: number, array: _Object[]) => {
-                    if (!value?.Key) {
-                        return;
+                const websitesWithLogos = [...websites];
+
+                if (fileList?.Contents) {
+                    for (const value of fileList.Contents) {
+                        if (!value?.Key) continue;
+
+                        const check = value.Key.split("/");
+                        for (const website of websitesWithLogos) {
+                            if (
+                                check[0] === website.associationName &&
+                                check[1] === "common" &&
+                                check[2].startsWith("logo-")
+                            ) {
+                                website.logo = `https://arcadia-bucket.s3.eu-west-3.amazonaws.com/${value.Key}`;
+                            }
+                        }
                     }
-                    const check = value.Key.split("/");
-                    websites.forEach(website => {
-                        if ((check[0] === website.associationName) && (check[1] === "common") && (check[2].startsWith("logo-"))) {
-                            setWebsites((prev) => {
-                                if (!prev.some(existingWebsite => existingWebsite.id === website.id)) {
-                                    return [...prev, {...website, logo: "https://arcadia-bucket.s3.eu-west-3.amazonaws.com/" + value.Key}];
-                                }
-                                return prev;
-                            });
-                        } 
-                    });
-                });
+                }
+                setWebsites(websitesWithLogos);
             } catch (error) {
                 console.error('List error:', error);
                 setErrorMessage("Erreur : " + error);
@@ -77,7 +89,7 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
             }
         };
         fetchData();
-    }, [websites]);
+    }, [websiteLoaded]);
 
     const handleClose = () => {
         setOpen(false);
@@ -98,74 +110,77 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
         setOpenModal(true);
     }
 
-    if (websites.length === 0) {
-        return <div>No websites...</div>
-    }else{
-        return (
-            <div>
-                <Snackbar
-                open={open}
-                autoHideDuration={3000}
-                onClose={handleClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                <Alert
-                    onClose={handleClose}
-                    severity="error"
-                    variant="filled"
-                    sx={{ width: '100%' }}
-                >{errorMessage}</Alert>
-            </Snackbar>
-            <Modal
-                open={openModal}
-                onClose={handleCloseModal}
-                aria-labelledby="modal-create-setting"
-                aria-describedby="modale to create a setting"
-                id="modal-create-setting"
-            >
-                <Paper elevation={1} className={"paper"}>
-                    <img src={logo} alt="image" style={{maxWidth: "50vh"}}/>
-                </Paper>
-            </Modal>
-                <h2>Vos sites web</h2>
-                <div style={{display: "flex", alignItems: "center"}}>
-                    <p>Vous pouvez gérer les sites web d'ici</p>
-                    <Link href={"/websites/new"} style={{marginLeft: "3vw"}} title={"Ajouter un site"}><AddCircleOutline/></Link>
+    if (isPageLoaded) {
+        if (websites.length === 0) {
+            return <div>No websites...</div>
+        }else{
+            return (
+                <div>
+                        <Snackbar
+                        open={open}
+                        autoHideDuration={3000}
+                        onClose={handleClose}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    >
+                        <Alert
+                            onClose={handleClose}
+                            severity="error"
+                            variant="filled"
+                            sx={{ width: '100%' }}
+                        >{errorMessage}</Alert>
+                    </Snackbar>
+                    <Modal
+                        open={openModal}
+                        onClose={handleCloseModal}
+                        aria-labelledby="modal-create-setting"
+                        aria-describedby="modale to create a setting"
+                        id="modal-create-setting"
+                    >
+                        <Paper elevation={1} className={"paper"}>
+                            <img src={logo} alt="image" style={{maxWidth: "50vh"}}/>
+                        </Paper>
+                    </Modal>
+                        <h2>Vos sites web</h2>
+                        <div style={{display: "flex", alignItems: "center"}}>
+                            <p>Vous pouvez gérer les sites web d'ici</p>
+                            <Link href={"/websites/new"} style={{marginLeft: "3vw"}} title={"Ajouter un site"}><AddCircleOutline/></Link>
+                        </div>
+                        <TableContainer component={Paper}>
+                            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>URL du site</TableCell>
+                                        <TableCell>Nom de l'association</TableCell>
+                                        <TableCell align="right">Statut</TableCell>
+                                        <TableCell align="center">Logo</TableCell>
+                                        <TableCell align="center">Actions</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {websites.map((website) => (
+                                        <TableRow
+                                            key={website.id}
+                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        >
+                                            <TableCell component="th" scope="row">
+                                                <a href={"https://"+ website.url + ".arcadia-solution.com"}>{website.url}</a>
+                                            </TableCell>
+                                            <TableCell>{website.associationName}</TableCell>
+                                            <TableCell style={{color: website.status === "active"? "green": "red"}} align="right">{website.status}</TableCell>
+                                        <TableCell align="center"><Button title={"Voir l'image"} onClick={() => showLogo(website.logo)}>{
+                                                    <VisibilityIcon/>}</Button></TableCell>
+                                            <TableCell align="right">
+                                                <Button title={"Modifier"}><Edit /></Button>
+                                                <Button title={"Supprimer"}>{<Delete />}</Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                 </div>
-                {errorMessage && <div className="error">{errorMessage}</div>}
-
-                <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>URL du site</TableCell>
-                                <TableCell align="right">Statut</TableCell>
-                                <TableCell align="right">Logo</TableCell>
-                                <TableCell align="right">Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {websites.map((website) => (
-                                <TableRow
-                                    key={website.id}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                >
-                                    <TableCell component="th" scope="row">
-                                        <a href={"https://"+ website.url + ".arcadia-solution.com"}>{website.url}</a>
-                                    </TableCell>
-                                    <TableCell style={{color: website.status === "active"? "green": "red"}} align="right">{website.status}</TableCell>
-                                   <TableCell align="center"><a onClick={()=>showLogo(website.logo)}>Voir l'image</a></TableCell>
-                                    <TableCell align="right">
-                                        <Button title={"Modifier"}><Edit /></Button>
-                                        <Button title={"Supprimer"}>{<Delete />}</Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </div>
-        );
+            );
+        }
     }
 }
 

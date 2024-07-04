@@ -341,6 +341,7 @@ export function NewWebsite() {
             dbPassword: data.dbPassword,
             userId: userID
         }
+        console.log(websiteDataDB)
         const website = await deployWesbite(scriptData,websiteDataDB)
         if (!website) return
 
