@@ -59,6 +59,7 @@ export function UserRegisterForm(props: UserFormProps) {
                 <OutlinedInput
                         id="outlined-adornment-password"
                         type={showPassword ? 'text' : 'password'}
+                        value={props.password}  
                         onChange={e => props.updateFields({password: e.target.value})}
                         sx={{width: '25vw'}} 
                         endAdornment={
@@ -82,6 +83,7 @@ export function UserRegisterForm(props: UserFormProps) {
                         id="outlined-adornment-password"
                         type={showConfirmPassword ? 'text' : 'password'}
                         onChange={e => props.updateFields({confirmPassword: e.target.value})}
+                        value={props.confirmPassword}
                         sx={{width: '25vw'}} 
                         endAdornment={
                         <InputAdornment position="end">

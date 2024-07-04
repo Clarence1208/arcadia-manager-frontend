@@ -26,10 +26,12 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     const [isPageLoaded, setIsPageLoaded] = useState(false);
 
     useEffect(() => {
-        setTimeout(() => {
-            setIsPageLoaded(true);
-        }, 100);
-    }, []);
+        if (websiteLoaded) {
+            setTimeout(() => {
+                setIsPageLoaded(true);
+            }, 200);
+        }
+    }, [websiteLoaded]);
 
     useEffect(() => {
             if (userToken && userId) {

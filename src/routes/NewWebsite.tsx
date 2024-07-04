@@ -106,6 +106,7 @@ export function NewWebsite() {
 
     function updateFields(fields: Partial<FormData>) {
         if (fields.url) {
+            console.log(fields.url)
             fields.url = fields.url.toLowerCase();
             if (specialChars.test(fields.url)) {
                 setErrorMessage("L'URL ne doit pas contenir de caractères spéciaux");
@@ -113,12 +114,17 @@ export function NewWebsite() {
                 return
             }
             setIsWebsiteNameTaken(false);
-            for (let website of websites) {
-                const check = website.url.split(".")[0];
-                if (check === fields.url) {
+            for (const website of websites) {
+                console.log(website.url)
+                if (website.url === fields.url) {
+                    console.log("Website name taken")
                     setIsWebsiteNameTaken(true);
                     setErrorMessage("L'URL est déjà utilisée");
                     setOpen(true);
+                    setData(prev => {
+                        return {...prev, ...fields}
+                    })
+                    return
                 }
             }
         }
@@ -431,11 +437,6 @@ export function NewWebsite() {
                         <div style={{position: "absolute", top: ".5rem", right: ".5rem"}}>
                             Etape {currentStepIndex + 1} / {steps.length}
                         </div>
-                        <Collapse in={open}>
-                            <Alert severity="success" onClose={() => setOpen(false)}>
-                                {websiteCreationProcess.message}
-                            </Alert>
-                        </Collapse>
                 </div>
                 <Footer/>
             </div>

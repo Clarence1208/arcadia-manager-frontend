@@ -57,6 +57,7 @@ export function RecapForm(props: RecapProps) {
                         id="outlined-adornment-password"
                         type={showPassword ? 'text' : 'password'}
                         onChange={e => props.updateFields({password: e.target.value})}
+                        value={props.password}
                         sx={{width: '15vw'}} 
                         endAdornment={
                         <InputAdornment position="end">
@@ -80,6 +81,7 @@ export function RecapForm(props: RecapProps) {
                         type={showConfirmPassword ? 'text' : 'password'}
                         onChange={e => props.updateFields({confirmPassword: e.target.value})}
                         sx={{width: '15vw'}} 
+                        value={props.confirmPassword}
                         endAdornment={
                         <InputAdornment position="end">
                             <IconButton
@@ -108,6 +110,7 @@ export function RecapForm(props: RecapProps) {
                             id="outlined-adornment-password"
                             sx={{width: '15vw'}}
                             type={showAdminPassword ? 'text' : 'password'}
+                            value={props.dbPassword}
                             onChange={e => props.updateFields({dbPassword: e.target.value})}
                             endAdornment={
                             <InputAdornment position="end">

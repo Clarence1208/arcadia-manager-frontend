@@ -87,6 +87,7 @@ export function WebsiteForm(props: WebsiteFormProps) {
                         sx={{width: '25vw'}}
                         type={showPassword ? 'text' : 'password'}
                         onChange={e => props.updateFields({dbPassword: e.target.value})}
+                        value={props.dbPassword}
                         endAdornment={
                         <InputAdornment position="end">
                             <IconButton
