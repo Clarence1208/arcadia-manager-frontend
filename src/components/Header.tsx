@@ -49,7 +49,7 @@ export default function Header() {
             <a href="/"><img src={logo} alt="logo" /></a>
         </div>
           <div className="nav-header">
-             <CustomNavItem link="/services" text="Nos services" expand={true} />
+             <CustomNavItem link="/services" text="Nos services" />
               <CustomNavItem link="/websites/new" text="Créer un site" />
                 <CustomNavItem link="/contact" text="Contact" />
               {userSession?.isLoggedIn && <CustomNavItem link="/dashboard" text="Tableau de bord" />}

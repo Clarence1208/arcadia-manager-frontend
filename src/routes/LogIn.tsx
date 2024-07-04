@@ -44,23 +44,29 @@ function LogInForm() {
 
     async function onSubmit(e: FormEvent) {
         e.preventDefault()
-        const response: Response = await fetch(import.meta.env.VITE_API_URL + "/users/login", {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {"Content-Type": "application/json"}
-        });
-        if (!response.ok) {
-            const error = await response.json()
-            setErrorMessage("Erreur : " + await error.message);
+        try {
+            const response: Response = await fetch(import.meta.env.VITE_API_URL + "/users/login", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {"Content-Type": "application/json"}
+            });
+            if (!response.ok) {
+                const error = await response.json()
+                setErrorMessage("Erreur : " + await error.message);
+                setOpen(true);
+                return
+            }
+            const res = await response.json();
+            if (sessionContext) {
+                sessionContext.updateUserSession({
+                    userId: res.id, loginToken: res.loginToken,
+                    fullName: res.firstName + " " + res.surname, isLoggedIn: true
+                })
+            }
+        } catch (e) {
+            setErrorMessage("Erreur : " + e);
             setOpen(true);
             return
-        }
-        const res = await response.json();
-        if (sessionContext) {
-            sessionContext.updateUserSession({
-                userId: res.id, loginToken: res.loginToken,
-                fullName: res.firstName + " " + res.surname, isLoggedIn: true
-            })
         }
         navigate('/dashboard')
     }
