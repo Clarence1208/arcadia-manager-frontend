@@ -25,6 +25,12 @@ export function Register() {
     const navigate = useNavigate();
     const [data, setData] = useState(body)
     const [errorMessage, setErrorMessage] = useState("")
+    const [open, setOpen] = useState(false);
+
+    const handleClose = () => {
+        setOpen(false);
+        setErrorMessage("");
+    };
 
     function updateFields(fields: Partial<FormData>) {
         setData(prev => {
@@ -62,7 +68,7 @@ export function Register() {
             <div className="main">
                 <Paper elevation={1} className={"paper"} style={{width: "40vw"}}>
                 <div style={{display: 'flex', flexDirection: "column", justifyContent: 'center', alignItems: 'center'}}className="form-and-button">
-                    <UserRegisterForm {...data} formTitle={"Créer un compte"}
+                    <UserRegisterForm {...data} formTitle={"Créer un compte"} open={open} handleClose={handleClose}
                                       formDescription={"Création de compte Arcadia pour vos sites"}
                                       formError={errorMessage} updateFields={updateFields}/>
                     <Button sx={{marginTop: '2vh', width: '25vw', marginLeft: '3vh'}} variant="contained" type={"submit"} onClick={handleSubmit}>Valider</Button>
