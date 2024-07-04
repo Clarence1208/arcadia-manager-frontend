@@ -20,13 +20,14 @@ type UserFormProps = UserData & {
     formDescription: string,
     formError: string,
     updateFields: (fields: Partial<UserData>) => void
+    handleClose: () => void,
+    open: boolean
 }
 
 export function UserRegisterForm(props: UserFormProps) {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [open, setOpen] = useState(true);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -48,7 +49,7 @@ export function UserRegisterForm(props: UserFormProps) {
                 </Tooltip>
             </div>
             <p>{props.formDescription}</p>
-            {props.formError && <Collapse in={open}><Alert className="alert" onClose={() => setOpen(false)} severity="error">{props.formError}</Alert></Collapse>}
+            {props.formError && <Collapse in={props.open}><Alert className="alert" onClose={props.handleClose} severity="error">{props.formError}</Alert></Collapse>}
             <div className="form-inputs">
                 <TextField className="form-input" color="primary" variant="outlined" label="Prénom" autoFocus required type="text" value={props.firstName} onChange={e => props.updateFields({ firstName: e.target.value })} />
                 <TextField className="form-input" variant="outlined" label="Nom de famille" required type="text" value={props.surname} onChange={e => props.updateFields({ surname: e.target.value })} />

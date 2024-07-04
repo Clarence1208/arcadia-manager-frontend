@@ -43,7 +43,6 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                     });
                     if (!response.ok) {
                         const error = await response.json()
-                        console.log(error)
                         setErrorMessage("Erreur : " + await error.message);
                         return []
                     }
@@ -112,7 +111,13 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
 
     if (isPageLoaded) {
         if (websites.length === 0) {
-            return <div>No websites...</div>
+            return <div>
+                <h2>Vous n'avez pas encore de site !</h2>
+                <h3>Créez-en un en cliquant sur le bouton "Créer un site"</h3>
+                <a color="primary" href="/websites/new">
+                    <Button variant="contained" color="primary" type="submit" disableElevation>Créer un site</Button>
+                </a>
+            </div>
         }else{
             return (
                 <div>

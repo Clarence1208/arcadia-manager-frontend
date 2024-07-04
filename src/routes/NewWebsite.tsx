@@ -33,6 +33,7 @@ type WebsiteData = {
     subDomain: string;
     dbPassword: string;
     associationName: string;
+    logoName: string;
 }
 const body: FormData = {
     firstName: "",
@@ -47,29 +48,33 @@ const body: FormData = {
     associationName: ""
 }
 
+type Website = {
+    id: number;
+    url: string;
+    associationName: string;
+    status: string;
+    logo: string | undefined;
+}
+
 export function NewWebsite() {
     const navigate = useNavigate()
     const userSessionContext = useContext(UserSessionContext)
     const userSession = userSessionContext?.userSession
     const [data, setData] = useState(body)
     const [errorMessage, setErrorMessage] = useState("")
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const [websiteCreationProcess, setWebsiteCreationProcess] = useState({
         status: "idle",
         message: "Création du compte Arcadia en cours..."
     })
     const fileRef = useRef<File | null>(null);
+    const specialChars = /[\[\];§¨£µ=+°\-'~²_`!@#$%^&*(),.?":{}|<>\/\\]/;
+    const [websites, setWebsites] = useState<Website[]>([])  
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>|null, action: boolean) => {
         if (action) {
             const file = event?.target.files?.[0];
             if (file) {
-                console.log('File details:', {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    lastModified: file.lastModified,
-                });
                 fileRef.current = file;
                 updateFields({logoName: file.name})
             }
@@ -79,20 +84,60 @@ export function NewWebsite() {
         }
     };
 
+    useEffect(() => {
+            const getWebsites = async (): Promise<Website[]> => {
+                const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites`, {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const error = await response.json()
+                    setErrorMessage("Erreur : " + await error.message);
+                    setOpen(true);
+                    return []
+                }
+                const res = await response.json();
+                return res;
+            }
+            getWebsites().then(setWebsites);
+    }, [])
+
     function updateFields(fields: Partial<FormData>) {
+        if (fields.url) {
+            fields.url = fields.url.toLowerCase();
+            if (specialChars.test(fields.url)) {
+                setErrorMessage("L'URL ne doit pas contenir de caractères spéciaux");
+                setOpen(true);
+                return
+            }
+            for (let website of websites) {
+                if (website.url === fields.url) {
+                    setErrorMessage("L'URL est déjà utilisée");
+                    setOpen(true);
+                }
+            }
+        }
+        setErrorMessage("");
+        setOpen(false);
         setData(prev => {
             return {...prev, ...fields}
         })
     }
 
+    const handleClose = () => {
+        setOpen(false);
+        setErrorMessage("");
+    };
+
     //If user already has an account and is logged in, don't need the user register form
     let forms = [
-        <UserRegisterForm {...data} updateFields={updateFields} formError={errorMessage}
+        <UserRegisterForm {...data} updateFields={updateFields} formError={errorMessage} handleClose={handleClose} open={open}
                           formTitle="Créer un compte Arcadia"
                           formDescription="Sur votre compte Arcadia, vous retrouverez vos sites, vos paiements et vos informations personnelles."/>,
-        <WebsiteForm {...data} updateFields={updateFields} handleFileChange={handleFileChange} formError={errorMessage} formTitle="Créer un site internet"
+        <WebsiteForm {...data} updateFields={updateFields} handleClose={handleClose} open={open} handleFileChange={handleFileChange} formError={errorMessage} formTitle="Créer un site internet"
                      formDescription="Ces informations seront utilisées pour configurer votre site."/>,
-        <RecapForm {...data} updateFields={updateFields} formError={errorMessage} formTitle="Récapitulatif des données"
+        <RecapForm {...data} updateFields={updateFields} formError={errorMessage} formTitle="Récapitulatif des données" handleClose={handleClose} open={open}
                    formDescription="Attention certaines informations ne pourront pas être modifiées ultèrieurement."/>
     ]
     if (userSession?.isLoggedIn) {
@@ -104,6 +149,7 @@ export function NewWebsite() {
     async function createUser(userData:Partial<FormData>) {
         if (userData.password !== userData.confirmPassword) {
             setErrorMessage("Les mots de passe ne correspondent pas");
+            setOpen(true);
             return
         }
         delete userData.confirmPassword;
@@ -115,6 +161,7 @@ export function NewWebsite() {
         if (!response.ok) {
             const error = await response.json()
             setErrorMessage("Erreur lors de la création du compte: " + await error.message);
+            setOpen(true);
             setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
             return
         }
@@ -131,6 +178,7 @@ export function NewWebsite() {
         if (!response.ok) {
             const error = await response.json()
             setErrorMessage("Erreur : " + await error.message);
+            setOpen(true);
             return
         }
         setErrorMessage("");
@@ -207,6 +255,7 @@ export function NewWebsite() {
         if (!response.ok) {
             const error = await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setOpen(true);
             setWebsiteCreationProcess({...websiteCreationProcess, status: "Failed"})
             return;
         }
@@ -221,7 +270,6 @@ export function NewWebsite() {
             surname: otherData.surname,
         }
         const data = {...websiteData, ...userData}
-        console.log(data)
 
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/websites/scripts/apiDocker", {
             method: "POST",
@@ -231,6 +279,7 @@ export function NewWebsite() {
         if (!response.ok) {
             const error = await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setOpen(true);
             setWebsiteCreationProcess({...websiteCreationProcess, status: "Failed"})
             return;
         }
@@ -246,6 +295,7 @@ export function NewWebsite() {
         if (!response.ok) {
             const error = await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setOpen(true);
             setWebsiteCreationProcess({...websiteCreationProcess, status: "Failed"})
             return;
         }
@@ -261,6 +311,7 @@ export function NewWebsite() {
         if (!response.ok) {
             const error = await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setOpen(true);
             setWebsiteCreationProcess({...websiteCreationProcess, status: "Failed"})
             return;
         }
@@ -277,6 +328,7 @@ export function NewWebsite() {
         if (!response.ok) {
             const error = await response.json()
             setErrorMessage("Erreur lors de la création du site web: " + await error.message);
+            setOpen(true);
             setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
             return
         }
@@ -332,7 +384,8 @@ export function NewWebsite() {
             name: data.dbUsername,
             dbPassword: data.dbPassword,
             userId: userID,
-            associationName: data.associationName
+            associationName: data.associationName,
+            logoName: data.logoName ?? "logo-logo-green.svg"
         }
         const websiteDataDB = {
             url: data.url,
@@ -341,7 +394,6 @@ export function NewWebsite() {
             dbPassword: data.dbPassword,
             userId: userID
         }
-        console.log(websiteDataDB)
         const website = await deployWesbite(scriptData,websiteDataDB)
         if (!website) return
 

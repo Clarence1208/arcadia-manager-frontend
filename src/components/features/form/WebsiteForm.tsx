@@ -1,5 +1,5 @@
 
-import {Alert, Button, IconButton, InputAdornment, InputLabel, OutlinedInput, styled, TextField} from "@mui/material";
+import {Alert, Button, Collapse, IconButton, InputAdornment, InputLabel, OutlinedInput, styled, TextField} from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import '../../../styles/App.css';
 import { useState } from "react";
@@ -30,13 +30,14 @@ type WebsiteFormProps = WebsiteData & {
     formDescription: string,
     formError: string,
     updateFields: (fields: Partial<WebsiteData>) => void,
-    handleFileChange: (event: React.ChangeEvent<HTMLInputElement>|null, action: boolean) => void
+    handleFileChange: (event: React.ChangeEvent<HTMLInputElement>|null, action: boolean) => void,
+    handleClose: () => void,
+    open: boolean
 }
 
 export function WebsiteForm(props: WebsiteFormProps) {
 
     const [showPassword, setShowPassword] = useState(false);
-    const [open, setOpen] = useState(true);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -48,7 +49,7 @@ export function WebsiteForm(props: WebsiteFormProps) {
         <div className="form-base">
             <h1>{props.formTitle}</h1>
             <p>{props.formDescription}</p>
-            {props.formError && <Alert className={"alert"} severity="error" onClose={() => {}}>{props.formError} </Alert>}
+            {props.formError && <Collapse in={props.open}><Alert className="alert" onClose={props.handleClose} severity="error">{props.formError}</Alert></Collapse>}
             <div className="form-inputs">
                 <TextField className="form-input" variant="outlined" label="URL du site" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>,}} autoFocus required type="text" value={props.url} onChange={e => props.updateFields({ url: e.target.value })} />
                 <TextField className="form-input" variant="outlined" label="Nom de l'association" required type="text" value={props.associationName} onChange={e => props.updateFields({associationName: e.target.value})}/>

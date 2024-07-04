@@ -1,5 +1,5 @@
 
-import {Alert, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from "@mui/material";
+import {Alert, Collapse, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from "@mui/material";
 import '../../../styles/App.css';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
@@ -22,13 +22,14 @@ type RecapProps = RecapData & {
     formDescription: string,
     formError: string,
     updateFields: (fields: Partial<RecapData>) => void
+    handleClose: () => void,
+    open: boolean
 }
 
 export function RecapForm(props: RecapProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showAdminPassword, setShowAdminPassword] = useState(false);
-
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
     const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
@@ -43,7 +44,7 @@ export function RecapForm(props: RecapProps) {
         <div className="form-base">
             <h1>{props.formTitle}</h1>
             <p>{props.formDescription}</p>
-            {props.formError && <Alert className={"alert"} severity="error" onClose={() => {}}>{props.formError}</Alert>}
+            {props.formError && <Collapse in={props.open}><Alert className="alert" onClose={props.handleClose} severity="error">{props.formError}</Alert></Collapse>}
             <div style={{display: "flex", flexDirection: "row", justifyContent: "space-around" }}>
                 <div className="form-inputs">
                     <h3>Création de compte:</h3>

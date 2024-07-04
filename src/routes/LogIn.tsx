@@ -21,7 +21,8 @@ function LogInForm() {
     const sessionContext = useContext(UserSessionContext)
 
     const [queryParameters] = useSearchParams();
-    const [open, setOpen] = useState(queryParameters.get('successMessage') === "true");
+    const [open, setOpen] = useState(queryParameters.get('error') === "true");
+    const [openSuccessRegister, setopenSuccessRegisterOpen] = useState(queryParameters.get('successMessage') === "true");
     const [errorMessage, setErrorMessage] = useState("")
     const [data, setData] = useState(body)
     const [showPassword, setShowPassword] = useState(false);
@@ -35,6 +36,10 @@ function LogInForm() {
     const handleClose = () => {
         setOpen(false);
         setErrorMessage("");
+    };
+
+    const handleCloseSuccessRegister = () => {
+        setopenSuccessRegisterOpen(false);
     };
 
     async function onSubmit(e: FormEvent) {
@@ -72,6 +77,19 @@ function LogInForm() {
 
     return (
         <form id="formLogin" onSubmit={onSubmit}>
+            <Snackbar
+                open={openSuccessRegister}
+                autoHideDuration={3000}
+                onClose={handleCloseSuccessRegister}
+                anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+            >
+                <Alert
+                    onClose={handleCloseSuccessRegister}
+                    severity={errorMessage.includes("Erreur") ? "error" : "success"}
+                    variant="filled"
+                    sx={{width: '100%'}}
+                >{errorMessage}</Alert>
+            </Snackbar>
             <Snackbar
                 open={open}
                 autoHideDuration={3000}
@@ -126,7 +144,7 @@ function LogInForm() {
                 <Link href={"/register"}>Créer un compte ?</Link>
             </div>
             <Snackbar
-                open={open}
+                open={openSuccessRegister}
                 autoHideDuration={3000}
                 onClose={() => setOpen(false)}
                 anchorOrigin={{vertical: 'top', horizontal: 'right'}}
@@ -149,7 +167,7 @@ function LogInForm() {
 export function LogIn() {
     return (
         <div className="containerRow">
-            <div className="rotated-text">ADMIN</div>
+            <div className="rotated-text">CONNEXION</div>
             <div className="green-separator"/>
             <div className="containerCol">
                 <LogInForm/>
