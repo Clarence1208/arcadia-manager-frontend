@@ -181,6 +181,8 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                 </div>
             );
         }
+    } else {
+        return <div></div>
     }
 }
 
