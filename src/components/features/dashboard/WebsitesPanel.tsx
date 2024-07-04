@@ -1,12 +1,15 @@
 import {useEffect, useState} from "react";
 import {AddCircleOutline, Delete, Edit} from "@mui/icons-material";
-import {Button, Link, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
-import logo from "../../../images/logo.png";
+import {Alert, Button, Link, Modal, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import { listFilesS3 } from "../../../utils/s3";
+import { _Object } from "@aws-sdk/client-s3";
+
 type Website = {
     id: number;
     url: string;
+    associationName: string;
     status: string;
-
+    logo: string | undefined;
 }
 type WebsitesPanelProps = {
     userId: number | undefined;
@@ -15,6 +18,9 @@ type WebsitesPanelProps = {
 export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     const [errorMessage, setErrorMessage] = useState<string>("")
     const [websites, setWebsites] = useState<Website[]>([])
+    const [open, setOpen] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
+    const [logo, setLogo] = useState<string>("");
 
     useEffect(() => {
             if (userToken && userId) {
@@ -43,11 +49,84 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
         }
     , [userToken, userId])
 
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const fileList = await listFilesS3();
+                fileList?.Contents?.forEach((value: _Object, index: number, array: _Object[]) => {
+                    if (!value?.Key) {
+                        return;
+                    }
+                    const check = value.Key.split("/");
+                    websites.forEach(website => {
+                        if ((check[0] === website.associationName) && (check[1] === "common") && (check[2].startsWith("logo-"))) {
+                            setWebsites((prev) => {
+                                if (!prev.some(existingWebsite => existingWebsite.id === website.id)) {
+                                    return [...prev, {...website, logo: "https://arcadia-bucket.s3.eu-west-3.amazonaws.com/" + value.Key}];
+                                }
+                                return prev;
+                            });
+                        } 
+                    });
+                });
+            } catch (error) {
+                console.error('List error:', error);
+                setErrorMessage("Erreur : " + error);
+                setOpen(true);
+            }
+        };
+        fetchData();
+    }, [websites]);
+
+    const handleClose = () => {
+        setOpen(false);
+        setErrorMessage("")
+    }
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+    }
+
+    const showLogo = (url: string|undefined) => {
+        if (!url) {
+            setErrorMessage("Erreur : Pas d'image pour ce site web");
+            setOpen(true);
+            return;
+        }
+        setLogo(url);
+        setOpenModal(true);
+    }
+
     if (websites.length === 0) {
         return <div>No websites...</div>
     }else{
         return (
             <div>
+                <Snackbar
+                open={open}
+                autoHideDuration={3000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="error"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >{errorMessage}</Alert>
+            </Snackbar>
+            <Modal
+                open={openModal}
+                onClose={handleCloseModal}
+                aria-labelledby="modal-create-setting"
+                aria-describedby="modale to create a setting"
+                id="modal-create-setting"
+            >
+                <Paper elevation={1} className={"paper"}>
+                    <img src={logo} alt="image" style={{maxWidth: "50vh"}}/>
+                </Paper>
+            </Modal>
                 <h2>Vos sites web</h2>
                 <div style={{display: "flex", alignItems: "center"}}>
                     <p>Vous pouvez gérer les sites web d'ici</p>
@@ -75,7 +154,7 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                                         <a href={"https://"+ website.url + ".arcadia-solution.com"}>{website.url}</a>
                                     </TableCell>
                                     <TableCell style={{color: website.status === "active"? "green": "red"}} align="right">{website.status}</TableCell>
-                                   <TableCell align="center"><a onClick={()=>alert("Flemme")}>Voir l'image</a></TableCell>
+                                   <TableCell align="center"><a onClick={()=>showLogo(website.logo)}>Voir l'image</a></TableCell>
                                     <TableCell align="right">
                                         <Button title={"Modifier"}><Edit /></Button>
                                         <Button title={"Supprimer"}>{<Delete />}</Button>

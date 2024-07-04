@@ -20,6 +20,7 @@ type FormData = {
     email: string
     password: string
     confirmPassword: string
+    logoName: string
     url: string
     dbUsername: string,
     dbPassword: string,
@@ -39,6 +40,7 @@ const body: FormData = {
     email: "",
     password: "",
     confirmPassword: "",
+    logoName: "",
     url: "",
     dbUsername: "",
     dbPassword: "",
@@ -58,17 +60,22 @@ export function NewWebsite() {
     })
     const fileRef = useRef<File | null>(null);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            console.log('File details:', {
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                lastModified: file.lastModified,
-            });
-            fileRef.current = file;
-            console.log('File reference:', fileRef.current);
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>|null, action: boolean) => {
+        if (action) {
+            const file = event?.target.files?.[0];
+            if (file) {
+                console.log('File details:', {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    lastModified: file.lastModified,
+                });
+                fileRef.current = file;
+                updateFields({logoName: file.name})
+            }
+        } else {
+            fileRef.current = null;
+            updateFields({logoName: ""})
         }
     };
 
@@ -329,6 +336,7 @@ export function NewWebsite() {
         }
         const websiteDataDB = {
             url: data.url,
+            associationName: data.associationName,
             dbUsername: data.dbUsername,
             dbPassword: data.dbPassword,
             userId: userID

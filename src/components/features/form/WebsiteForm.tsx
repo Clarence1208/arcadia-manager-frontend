@@ -17,6 +17,7 @@ const VisuallyHiddenInput = styled('input')({
 
 type WebsiteData = {
     url: string,
+    logoName: string,
     dbUsername: string,
     dbPassword: string,
     associationName: string
@@ -27,7 +28,7 @@ type WebsiteFormProps = WebsiteData & {
     formDescription: string,
     formError: string,
     updateFields: (fields: Partial<WebsiteData>) => void,
-    handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+    handleFileChange: (event: React.ChangeEvent<HTMLInputElement>|null, action: boolean) => void
 }
 
 export function WebsiteForm(props: WebsiteFormProps) {
@@ -49,9 +50,18 @@ export function WebsiteForm(props: WebsiteFormProps) {
                     Charger un logo
                     <VisuallyHiddenInput
                         type="file"
-                        onChange={props.handleFileChange}
+                        onChange={(e) => props.handleFileChange(e, true)}
                     />
                 </Button>
+                {(props.logoName != "") && 
+                    <div style={{display: "flex", alignItems:"center", justifyContent: "center"}}>
+                        <Button
+                            component="label"
+                            onClick={(e) => props.handleFileChange(null, false)}
+                        >X</Button>
+                        <p>{props.logoName}</p>
+                    </div>
+                    }
                 <TextField variant="outlined" label="Email de l'administrateur par défaut" required type="text" value={props.dbUsername} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
                 <TextField variant="outlined" label="Mot de passe de l'administrateur" required type="password" value={props.dbPassword} onChange={e => props.updateFields({dbPassword: e.target.value})} />
 
