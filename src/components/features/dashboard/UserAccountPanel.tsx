@@ -63,6 +63,12 @@ export function UserAccountPanel({userId, userToken}: UserPanelProps) {
     const [data, setData] = useState(body)
     const [updateData, setUpdateData] = useState({})
     const [errorMessage, setErrorMessage] = useState("")
+    const [open, setOpen] = useState(false);
+
+    const handleClose = () => {
+        setOpen(false);
+        setErrorMessage("");
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -97,7 +103,7 @@ export function UserAccountPanel({userId, userToken}: UserPanelProps) {
 
     return (
         <div>
-            <UserRegisterForm {...data} updateFields={updateFields} formError={errorMessage} formTitle="Mes informations personnelles" formDescription="Voici les données que nous avons enregistrés par rapport à votre compte."/>
+            <UserRegisterForm {...data} updateFields={updateFields} open={open} handleClose={handleClose} formError={errorMessage} formTitle="Mes informations personnelles" formDescription="Voici les données que nous avons enregistrés par rapport à votre compte."/>
             <Button variant="outlined" type={"submit"} onClick={handleSubmit} >Mettre à jour</Button>
         </div>
     )
