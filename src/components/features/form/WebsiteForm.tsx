@@ -1,7 +1,9 @@
 
-import {Alert, Button, InputAdornment, styled, TextField} from "@mui/material";
+import {Alert, Button, IconButton, InputAdornment, InputLabel, OutlinedInput, styled, TextField} from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import '../../../styles/App.css';
+import { useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -32,15 +34,26 @@ type WebsiteFormProps = WebsiteData & {
 }
 
 export function WebsiteForm(props: WebsiteFormProps) {
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [open, setOpen] = useState(true);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+      };
+
     return (
         <div className="form-base">
             <h1>{props.formTitle}</h1>
             <p>{props.formDescription}</p>
             {props.formError && <Alert className={"alert"} severity="error" onClose={() => {}}>{props.formError} </Alert>}
             <div className="form-inputs">
-                <TextField variant="outlined" label="URL du site" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>,}} autoFocus required type="text" value={props.url} onChange={e => props.updateFields({ url: e.target.value })} />
-                <TextField variant="outlined" label="Nom de l'association" required type="text" value={props.associationName} onChange={e => props.updateFields({associationName: e.target.value})}/>
+                <TextField className="form-input" variant="outlined" label="URL du site" InputProps={{endAdornment: <InputAdornment position="end">.arcadia-solution.com</InputAdornment>,}} autoFocus required type="text" value={props.url} onChange={e => props.updateFields({ url: e.target.value })} />
+                <TextField className="form-input" variant="outlined" label="Nom de l'association" required type="text" value={props.associationName} onChange={e => props.updateFields({associationName: e.target.value})}/>
                 <Button
+                    className="form-input"
                     component="label"
                     role="button"
                     variant="contained"
@@ -62,9 +75,32 @@ export function WebsiteForm(props: WebsiteFormProps) {
                         <p>{props.logoName}</p>
                     </div>
                     }
-                <TextField variant="outlined" label="Email de l'administrateur par défaut" required type="text" value={props.dbUsername} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
-                <TextField variant="outlined" label="Mot de passe de l'administrateur" required type="password" value={props.dbPassword} onChange={e => props.updateFields({dbPassword: e.target.value})} />
-
+                <div>   
+                <InputLabel className="form-input" htmlFor="outlined-adornment-password">Email de l'administrateur</InputLabel>
+                <TextField className="form-input" variant="outlined" required type="text" value={props.dbUsername} onChange={e => props.updateFields({dbUsername: e.target.value})}/>
+                </div>    
+                <div>    
+                <InputLabel sx={{width: '25vw'}} htmlFor="outlined-adornment-password">Mot de passe de l'administrateur</InputLabel>
+                <OutlinedInput
+                        id="outlined-adornment-password"
+                        sx={{width: '25vw'}}
+                        type={showPassword ? 'text' : 'password'}
+                        onChange={e => props.updateFields({dbPassword: e.target.value})}
+                        endAdornment={
+                        <InputAdornment position="end">
+                            <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                            >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                        </InputAdornment>
+                        }
+                        label="Password"
+                    />
+                    </div>
             </div>
         </div>
     )

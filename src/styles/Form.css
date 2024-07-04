@@ -19,3 +19,15 @@
     align-items: center;
     height: 50vh;
 }
+
+.form-input{
+    width: 25vw !important;
+}
+
+.form-input-small{
+    width: 15vw !important;
+}
+
+.form-base{
+    margin-left: 3vh;
+}

@@ -61,10 +61,12 @@ export function Register() {
             <Header/>
             <div className="main">
                 <Paper elevation={1} className={"paper"} style={{width: "40vw"}}>
+                <div style={{display: 'flex', flexDirection: "column", justifyContent: 'center', alignItems: 'center'}}className="form-and-button">
                     <UserRegisterForm {...data} formTitle={"Créer un compte"}
                                       formDescription={"Création de compte Arcadia pour vos sites"}
                                       formError={errorMessage} updateFields={updateFields}/>
-                    <Button variant="contained" type={"submit"} onClick={handleSubmit}>Valider</Button>
+                    <Button sx={{marginTop: '2vh', width: '25vw', marginLeft: '3vh'}} variant="contained" type={"submit"} onClick={handleSubmit}>Valider</Button>
+                </div>
                 </Paper>
             </div>
             <Footer/>
