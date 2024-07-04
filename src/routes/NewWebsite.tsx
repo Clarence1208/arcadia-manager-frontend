@@ -70,6 +70,7 @@ export function NewWebsite() {
     const fileRef = useRef<File | null>(null);
     const specialChars = /[\[\];§¨£µ=+°\-'~²_`!@#$%^&*(),.?":{}|<>\/\\]/;
     const [websites, setWebsites] = useState<Website[]>([])  
+    const [isWebsiteNameTaken, setIsWebsiteNameTaken] = useState(false)
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>|null, action: boolean) => {
         if (action) {
@@ -111,8 +112,11 @@ export function NewWebsite() {
                 setOpen(true);
                 return
             }
+            setIsWebsiteNameTaken(false);
             for (let website of websites) {
-                if (website.url === fields.url) {
+                const check = website.url.split(".")[0];
+                if (check === fields.url) {
+                    setIsWebsiteNameTaken(true);
                     setErrorMessage("L'URL est déjà utilisée");
                     setOpen(true);
                 }
@@ -357,6 +361,13 @@ export function NewWebsite() {
 
     async function onSubmit(e: FormEvent) {
         e.preventDefault()
+
+        if (isWebsiteNameTaken) {
+            setErrorMessage("L'URL est déjà utilisée");
+            setOpen(true);
+            return
+        }
+
         if (!isLastStep) return next()
 
         let userID;
