@@ -39,7 +39,7 @@ export function UserRegisterForm(props: UserFormProps) {
 
 
     return (
-        <div className="form-base">
+        <div>
             <div className="form-header">
                 <h2>{props.formTitle}</h2>
                 <Tooltip title="Enter details about the user account.">

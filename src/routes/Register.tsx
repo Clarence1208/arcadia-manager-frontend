@@ -71,7 +71,7 @@ export function Register() {
                     <UserRegisterForm {...data} formTitle={"Créer un compte"} open={open} handleClose={handleClose}
                                       formDescription={"Création de compte Arcadia pour vos sites"}
                                       formError={errorMessage} updateFields={updateFields}/>
-                    <Button sx={{marginTop: '2vh', width: '25vw', marginLeft: '3vh'}} variant="contained" type={"submit"} onClick={handleSubmit}>Valider</Button>
+                    <Button sx={{marginTop: '2vh', width: '25vw'}} variant="contained" type={"submit"} onClick={handleSubmit}>Valider</Button>
                 </div>
                 </Paper>
             </div>
