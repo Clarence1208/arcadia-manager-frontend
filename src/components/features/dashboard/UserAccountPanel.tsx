@@ -2,6 +2,7 @@ import {UserRegisterForm} from "../form/UserRegisterForm";
 import {useContext, useEffect, useState} from "react";
 import {Button} from "@mui/material";
 import {UserSessionContext} from "../../../contexts/user-session";
+import "../../../styles/UserAccountPanel.css";
 
 type FormData = {
     firstName: string
@@ -102,7 +103,7 @@ export function UserAccountPanel({userId, userToken}: UserPanelProps) {
     }, [userId, userToken]);
 
     return (
-        <div>
+        <div className="modify-form">
             <UserRegisterForm {...data} updateFields={updateFields} open={open} handleClose={handleClose} formError={errorMessage} formTitle="Mes informations personnelles" formDescription="Voici les données que nous avons enregistrés par rapport à votre compte."/>
             <Button style={{width:"25vw", marginTop: "2vh"}} variant="contained" type={"submit"} onClick={handleSubmit} >Mettre à jour</Button>
         </div>
