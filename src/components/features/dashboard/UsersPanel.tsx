@@ -109,7 +109,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
             try {
                 let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/deleteWebsite`, {
                     method: "POST",
-                    body: JSON.stringify(website.url),
+                    body: JSON.stringify({subdomain: website.url}),
                     headers: {
                         "Authorization": "Bearer " + userToken,
                         "Content-Type": "application/json"
@@ -154,7 +154,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
             try {
                 let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/pauseWebsite`, {
                     method: "POST",
-                    body: JSON.stringify(website.url),
+                    body: JSON.stringify({subdomain: website.url}),
                     headers: {
                         "Authorization": "Bearer " + userToken,
                         "Content-Type": "application/json"
@@ -200,7 +200,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
             try {
                 let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/resumeWebsite`, {
                     method: "POST",
-                    body: JSON.stringify(website.url),
+                    body: JSON.stringify({subdomain: website.url}),
                     headers: {
                         "Authorization": "Bearer " + userToken,
                         "Content-Type": "application/json"
