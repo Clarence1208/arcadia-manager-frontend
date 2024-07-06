@@ -68,7 +68,7 @@ export function NewWebsite() {
         message: "Création du compte Arcadia en cours..."
     })
     const fileRef = useRef<File | null>(null);
-    const specialChars = /[\[\];§¨£µ=+°\-'~²_`!@#$%^&*(),.?":{}|<>\/\\]/;
+    const specialChars = /[\[\];§¨£µ=+°\-'~²_`!@#$%^&*(),.?":{}|<>\/\\éèàëêôâîûüäùö]/;
     const [websites, setWebsites] = useState<Website[]>([])  
     const [isWebsiteNameTaken, setIsWebsiteNameTaken] = useState(false)
 

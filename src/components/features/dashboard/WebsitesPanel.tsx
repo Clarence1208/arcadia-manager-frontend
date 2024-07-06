@@ -1,9 +1,11 @@
 import {useEffect, useState} from "react";
 import {AddCircleOutline, Delete, Edit} from "@mui/icons-material";
-import {Alert, Button, Link, Modal, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {Alert, Button, CircularProgress, Link, Modal, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import { listFilesS3 } from "../../../utils/s3";
 import { _Object } from "@aws-sdk/client-s3";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 type Website = {
     id: number;
@@ -24,7 +26,13 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     const [logo, setLogo] = useState<string>("");
     const [websiteLoaded, setWebsiteLoaded] = useState<boolean>(false);
     const [isPageLoaded, setIsPageLoaded] = useState(false);
-
+    const [alertMessage, setAlertMessage] = useState<string>("");
+    const [action, setAction] = useState<string>("");
+    const [currentWebsite, setCurrentWebsite] = useState<Website | null>(null);
+    const [openDeleteAlertModal, setOpenDeleteAlertModal] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [changeOnPage, setChangeOnPage] = useState<boolean>(false);
+    
     useEffect(() => {
         if (websiteLoaded) {
             setTimeout(() => {
@@ -111,6 +119,180 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
         setOpenModal(true);
     }
 
+    const deleteWebsiteAlert = (website: Website) => {
+        return async () => {
+            setAlertMessage(`Vous êtes sur le point de supprimer <strong>${website.url}</strong>. Êtes-vous sûr de vouloir continuer ?`);
+            setCurrentWebsite(website);
+            setAction("delete");
+            setOpenDeleteAlertModal(true);
+        }
+    }
+
+    const pauseWebsiteAlert = (website: Website) => {
+        return async () => {
+            setAlertMessage(`Vous êtes sur le point de mettre en pause <strong>${website.url}</strong>. Êtes-vous sûr de vouloir continuer ?`);
+            setCurrentWebsite(website);
+            setAction("pause");
+            setOpenDeleteAlertModal(true);
+        }
+    }
+
+    const resumeWebsiteAlert = (website: Website) => {
+        return async () => {
+            setAlertMessage(`Vous êtes sur le point de remettre en ligne <strong>${website.url}</strong>. Êtes-vous sûr de vouloir continuer ?`);
+            setCurrentWebsite(website);
+            setAction("resume");
+            setOpenDeleteAlertModal(true);
+        }
+    }
+
+    const handleCloseDeleteAlertModal = () => {
+        setOpenDeleteAlertModal(false);
+    }
+
+    const deleteWebsite = (website: Website) => {
+        return async () => {
+            try {
+                setIsLoading(true);
+                let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/deleteWebsite`, {
+                    method: "POST",
+                    body: JSON.stringify({subdomain: website.url}),
+                    headers: {
+                        "Authorization": "Bearer " + userToken,
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const error = await response.json()
+                    setErrorMessage("Erreur : " + await error.message);
+                    setOpen(true);
+                    return
+                }
+                let res = await response.json();
+                response = await fetch(`${import.meta.env.VITE_API_URL}/websites/${website.id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": "Bearer " + userToken,
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const error = await response.json()
+                    setErrorMessage("Erreur : " + await error.message);
+                    setOpen(true);
+                    return
+                }
+                res = await response.json();
+                setChangeOnPage(!changeOnPage);
+                handleCloseModal();
+                handleCloseDeleteAlertModal();
+                setErrorMessage("Site web supprimé avec succès");
+                setOpen(true);
+                setIsLoading(false);
+                return res;
+            } catch (e) {
+                setErrorMessage("Erreur : " + e);
+                setOpen(true);
+            }
+        }
+    }
+
+    const pauseWebsite = (website: Website) => {
+        return async () => {
+            try {
+                setIsLoading(true);
+                let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/pauseWebsite`, {
+                    method: "POST",
+                    body: JSON.stringify({subdomain: website.url}),
+                    headers: {
+                        "Authorization": "Bearer " + userToken,
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const error = await response.json()
+                    setErrorMessage("Erreur : " + await error.message);
+                    setOpen(true);
+                    return
+                }
+                let res = await response.json();
+                response = await fetch(`${import.meta.env.VITE_API_URL}/websites/${website.id}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({status: "inactive"}),
+                    headers: {
+                        "Authorization": "Bearer " + userToken,
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const error = await response.json()
+                    setErrorMessage("Erreur : " + await error.message);
+                    setOpen(true);
+                    return
+                }
+                res = await response.json();
+                setChangeOnPage(!changeOnPage);
+                handleCloseModal();
+                handleCloseDeleteAlertModal();
+                setErrorMessage("Site web mis en pause avec succès");
+                setOpen(true);
+                setIsLoading(false);
+                return res;
+            } catch (e) {
+                setErrorMessage("Erreur : " + e);
+                setOpen(true);
+            }
+        }
+    }
+
+    const resumeWebsite = (website: Website) => {
+        return async () => {
+            try {
+                setIsLoading(true);
+                let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/resumeWebsite`, {
+                    method: "POST",
+                    body: JSON.stringify({subdomain: website.url}),
+                    headers: {
+                        "Authorization": "Bearer " + userToken,
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const error = await response.json()
+                    setErrorMessage("Erreur : " + await error.message);
+                    setOpen(true);
+                    return
+                }
+                let res = await response.json();
+                response = await fetch(`${import.meta.env.VITE_API_URL}/websites/${website.id}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({status: "active"}),
+                    headers: {
+                        "Authorization": "Bearer " + userToken,
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const error = await response.json()
+                    setErrorMessage("Erreur : " + await error.message);
+                    setOpen(true);
+                    return
+                }
+                res = await response.json();
+                setChangeOnPage(!changeOnPage);
+                handleCloseModal();
+                handleCloseDeleteAlertModal();
+                setErrorMessage("Site web remis en ligne avec succès");
+                setOpen(true);
+                setIsLoading(false);
+                return res;
+            } catch (e) {
+                setErrorMessage("Erreur : " + e);
+                setOpen(true);
+            }
+        }
+    }
+
     if (isPageLoaded) {
         if (!websites) {
             return <div>
@@ -136,6 +318,37 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                             sx={{ width: '100%' }}
                         >{errorMessage}</Alert>
                     </Snackbar>
+                    <Modal
+                        open={openDeleteAlertModal}
+                        onClose={handleCloseDeleteAlertModal}
+                        aria-labelledby="modal-delete-alert-websites"
+                        aria-describedby="modal alert to delete a website"
+                        id="modal-delete-alert-website"
+                    >
+                        <Paper elevation={1} className={"paper"}>
+                            { currentWebsite && !isLoading && 
+                                <div>
+                                    <h2>Attention !</h2>
+                                    <p dangerouslySetInnerHTML={{ __html: alertMessage }}></p>
+                                    {action === "delete" && 
+                                        <Button variant="contained" onClick={deleteWebsite(currentWebsite)}>Oui</Button>
+                                    }
+                                    {action === "pause" && 
+                                        <Button variant="contained" onClick={pauseWebsite(currentWebsite)}>Oui</Button>
+                                    }
+                                    {action === "resume" && 
+                                        <Button variant="contained" onClick={resumeWebsite(currentWebsite)}>Oui</Button>
+                                    }
+                                    <Button variant="outlined" style={{marginLeft: "2vh"}} onClick={handleCloseDeleteAlertModal}>Non</Button>
+                                </div>
+                            }
+                            {isLoading &&
+                                <div className='loader'>
+                                <CircularProgress />
+                                </div>
+                            }
+                        </Paper>
+                    </Modal>
                     <Modal
                         open={openModal}
                         onClose={handleCloseModal}
@@ -177,8 +390,13 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                                         <TableCell align="center"><Button title={"Voir l'image"} onClick={() => showLogo(website.logo)}>{
                                                     <VisibilityIcon/>}</Button></TableCell>
                                             <TableCell align="right">
-                                                <Button title={"Modifier"}><Edit /></Button>
-                                                <Button title={"Supprimer"}>{<Delete />}</Button>
+                                                {website.status === "active" &&
+                                                    <Button title={"Désactiver"} onClick={pauseWebsiteAlert(website)}><PauseIcon style={{color: 'lightRed'}} /></Button>
+                                                } 
+                                                { website.status === "inactive" &&
+                                                    <Button color={"error"} title={"Activer"} onClick={resumeWebsiteAlert(website)}><PlayArrowIcon style={{color: 'lightGreen'}} /></Button>
+                                                }
+                                                <Button title={"Supprimer"} onClick={deleteWebsiteAlert(website)}>{<Delete />}</Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}

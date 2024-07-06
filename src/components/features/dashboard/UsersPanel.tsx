@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {AddCircleOutline, Delete, Edit} from "@mui/icons-material";
-import {Alert, Button, Link, Modal, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {Alert, Button, CircularProgress, Link, Modal, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import { _Object } from "@aws-sdk/client-s3";
 import WebIcon from '@mui/icons-material/Web';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -39,6 +39,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
     const [changeOnPage, setChangeOnPage] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string>("");
     const [action, setAction] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (usersLoaded) {
@@ -107,6 +108,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
     const deleteWebsite = (website: Website) => {
         return async () => {
             try {
+                setIsLoading(true);
                 let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/deleteWebsite`, {
                     method: "POST",
                     body: JSON.stringify({subdomain: website.url}),
@@ -141,6 +143,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
                 handleCloseDeleteAlertModal();
                 setErrorMessage("Site web supprimé avec succès");
                 setOpen(true);
+                setIsLoading(false);
                 return res;
             } catch (e) {
                 setErrorMessage("Erreur : " + e);
@@ -152,6 +155,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
     const pauseWebsite = (website: Website) => {
         return async () => {
             try {
+                setIsLoading(true);
                 let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/pauseWebsite`, {
                     method: "POST",
                     body: JSON.stringify({subdomain: website.url}),
@@ -187,6 +191,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
                 handleCloseDeleteAlertModal();
                 setErrorMessage("Site web mis en pause avec succès");
                 setOpen(true);
+                setIsLoading(false);
                 return res;
             } catch (e) {
                 setErrorMessage("Erreur : " + e);
@@ -198,6 +203,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
     const resumeWebsite = (website: Website) => {
         return async () => {
             try {
+                setIsLoading(true);
                 let response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites/scripts/resumeWebsite`, {
                     method: "POST",
                     body: JSON.stringify({subdomain: website.url}),
@@ -233,6 +239,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
                 handleCloseDeleteAlertModal();
                 setErrorMessage("Site web remis en ligne avec succès");
                 setOpen(true);
+                setIsLoading(false);
                 return res;
             } catch (e) {
                 setErrorMessage("Erreur : " + e);
@@ -289,7 +296,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
                         id="modal-delete-alert-website"
                     >
                         <Paper elevation={1} className={"paper"}>
-                            { currentWebsite && 
+                            { currentWebsite && !isLoading && 
                                 <div>
                                     <h2>Attention !</h2>
                                     <p dangerouslySetInnerHTML={{ __html: alertMessage }}></p>
@@ -303,6 +310,11 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
                                         <Button variant="contained" onClick={resumeWebsite(currentWebsite)}>Oui</Button>
                                     }
                                     <Button variant="outlined" style={{marginLeft: "2vh"}} onClick={handleCloseDeleteAlertModal}>Non</Button>
+                                </div>
+                            }
+                            {isLoading &&
+                                <div className='loader'>
+                                <CircularProgress />
                                 </div>
                             }
                         </Paper>
@@ -339,7 +351,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
                                             <TableCell style={{color: website.status === "active"? "green": "red"}} align="right">{website.status}</TableCell>
                                             <TableCell align="right">
                                                 {website.status === "active" &&
-                                                    <Button title={"Désactiver"} onClick={pauseWebsiteAlert(website)}><PauseIcon style={{color: 'darkred'}} /></Button>
+                                                    <Button title={"Désactiver"} onClick={pauseWebsiteAlert(website)}><PauseIcon style={{color: 'lightRed'}} /></Button>
                                                 } 
                                                 { website.status === "inactive" &&
                                                     <Button color={"error"} title={"Activer"} onClick={resumeWebsiteAlert(website)}><PlayArrowIcon style={{color: 'lightGreen'}} /></Button>
