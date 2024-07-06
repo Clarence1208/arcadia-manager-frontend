@@ -80,9 +80,11 @@ export function Dashboard(){
                         <WebsitesPanel userId={userSession?.userId} userToken={userSession?.loginToken} />
                     </TabPanel>
                     }
-                    <TabPanel value={tabsValue} index={1}>
-                        <UserAccountPanel userId={userSession?.userId} userToken={userSession?.loginToken} />
-                    </TabPanel>
+                    {userSession?.roles === "superadmin" &&
+                        <TabPanel value={tabsValue} index={1}>
+                            <UserAccountPanel userId={userSession?.userId} userToken={userSession?.loginToken} />
+                        </TabPanel>
+                    }
                     <TabPanel value={tabsValue} index={2}>
                         <h2>Mon historique de paiement</h2>
                     </TabPanel>
