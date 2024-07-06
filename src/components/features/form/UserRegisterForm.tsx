@@ -39,7 +39,7 @@ export function UserRegisterForm(props: UserFormProps) {
 
 
     return (
-        <div className="form-base">
+        <div className="form-base-user">
             <div className="form-header">
                 <h2>{props.formTitle}</h2>
                 <Tooltip title="Enter details about the user account.">
@@ -50,7 +50,7 @@ export function UserRegisterForm(props: UserFormProps) {
             </div>
             <p>{props.formDescription}</p>
             {props.formError && <Collapse in={props.open}><Alert className="alert" onClose={props.handleClose} severity="error">{props.formError}</Alert></Collapse>}
-            <div className="form-inputs">
+            <div className="form-inputs-user">
                 <TextField className="form-input" color="primary" variant="outlined" label="Prénom" autoFocus required type="text" value={props.firstName} onChange={e => props.updateFields({ firstName: e.target.value })} />
                 <TextField className="form-input" variant="outlined" label="Nom de famille" required type="text" value={props.surname} onChange={e => props.updateFields({ surname: e.target.value })} />
                 <TextField className="form-input" variant="outlined" label="E-mail" required type="email" value={props.email} onChange={e => props.updateFields({email: e.target.value})}/>

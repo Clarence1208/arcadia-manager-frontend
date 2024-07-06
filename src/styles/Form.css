@@ -20,6 +20,13 @@
     height: 50vh;
 }
 
+.form-inputs-user{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 50vh;
+}
+
 .form-input{
     width: 25vw !important;
 }

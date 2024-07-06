@@ -57,10 +57,12 @@ function LogInForm() {
                 return
             }
             const res = await response.json();
+            console.log(res)
             if (sessionContext) {
                 sessionContext.updateUserSession({
                     userId: res.id, loginToken: res.loginToken,
-                    fullName: res.firstName + " " + res.surname, isLoggedIn: true
+                    fullName: res.firstName + " " + res.surname, isLoggedIn: true,
+                    roles: res.roles
                 })
             }
         } catch (e) {

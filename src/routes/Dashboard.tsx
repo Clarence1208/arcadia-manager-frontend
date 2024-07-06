@@ -6,6 +6,7 @@ import {WebsitesPanel} from "../components/features/dashboard/WebsitesPanel";
 import {UserAccountPanel} from "../components/features/dashboard/UserAccountPanel";
 import {Tab, Tabs} from "@mui/material";
 import "../styles/Dashboard.css";
+import { UsersPanel } from "../components/features/dashboard/UsersPanel";
 
 
 //tabs comes from MUI API docs https://mui.com/material-ui/react-tabs/
@@ -58,24 +59,36 @@ export function Dashboard(){
                     aria-label="Vertical tabs example"
                     sx={{ borderRight: 1, borderColor: 'divider' }}
                 >
-                    <Tab label="Mes sites" {...a11yProps(0)}/>
+                    {userSession?.roles !== "superadmin" &&
+                        <Tab label="Mes sites" {...a11yProps(0)}/>
+                    }
+                    {userSession?.roles === "superadmin" &&
+                        <Tab label="Gestion des utlisateurs" {...a11yProps(0)}/>
+                    }
                     <Tab label="Mon compte" {...a11yProps(1)}/>
-                    <Tab label="Historique de paiement" {...a11yProps(2)}/>
+                    {userSession?.roles !== "superadmin" &&
+                        <Tab label="Historique de paiement" {...a11yProps(2)}/>
+                    }
                 </Tabs>
 
                 <div className={"board"}>
                     <h1>Tableau de bord de {userSession?.fullName || "l'administrateur"}</h1>
 
                     {/*TABS PANEL: */}
+                    {userSession?.roles !== "superadmin" &&
                     <TabPanel value={tabsValue} index={0}>
                         <WebsitesPanel userId={userSession?.userId} userToken={userSession?.loginToken} />
                     </TabPanel>
+                    }
                     <TabPanel value={tabsValue} index={1}>
                         <UserAccountPanel userId={userSession?.userId} userToken={userSession?.loginToken} />
                     </TabPanel>
                     <TabPanel value={tabsValue} index={2}>
                         <h2>Mon historique de paiement</h2>
                     </TabPanel>
+                        <TabPanel value={tabsValue} index={0}>
+                            <UsersPanel userToken={userSession?.loginToken} />
+                        </TabPanel>
                 </div>
 
             </div>

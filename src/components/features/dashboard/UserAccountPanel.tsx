@@ -23,7 +23,7 @@ type UserPanelProps = {
 
 async function getUserData(userId: number, userToken: string) {
     const bearer = "Bearer " + userToken;
-    const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
+    const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}/withoutPassword`, {
         headers: {
             "Authorization": bearer,
             "Content-Type": "application/json"
@@ -31,10 +31,10 @@ async function getUserData(userId: number, userToken: string) {
     });
     if (!response.ok) {
         const error = await response.json()
-        console.log(error)
         return {}
     }
     const res = await response.json();
+    console.log(res)
     return res;
 
 }
@@ -81,6 +81,7 @@ export function UserAccountPanel({userId, userToken}: UserPanelProps) {
             return;
         }catch (e){
             setErrorMessage("Erreur"+e)
+            setOpen(true)
             console.log("error update", e)
         }
     }
@@ -92,7 +93,6 @@ export function UserAccountPanel({userId, userToken}: UserPanelProps) {
         setData(prev => {
             return { ...prev, ...fields }
         })
-        console.log(updateData)
     }
 
     useEffect(() => {
@@ -104,7 +104,7 @@ export function UserAccountPanel({userId, userToken}: UserPanelProps) {
     return (
         <div>
             <UserRegisterForm {...data} updateFields={updateFields} open={open} handleClose={handleClose} formError={errorMessage} formTitle="Mes informations personnelles" formDescription="Voici les données que nous avons enregistrés par rapport à votre compte."/>
-            <Button variant="outlined" type={"submit"} onClick={handleSubmit} >Mettre à jour</Button>
+            <Button style={{width:"25vw", marginTop: "2vh"}} variant="contained" type={"submit"} onClick={handleSubmit} >Mettre à jour</Button>
         </div>
     )
 }

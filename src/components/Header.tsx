@@ -41,6 +41,7 @@ function LogInOutButton() {
 export default function Header() {
 
     const userSession = useContext(UserSessionContext)?.userSession;
+    console.log(userSession)
 
     return (
         <div>
@@ -48,12 +49,21 @@ export default function Header() {
         <div className="header-logo">
             <a href="/"><img src={logo} alt="logo" /></a>
         </div>
-          <div className="nav-header">
-             <CustomNavItem link="/services" text="Nos services" />
-              <CustomNavItem link="/websites/new" text="Créer un site" />
-                <CustomNavItem link="/contact" text="Contact" />
-              {userSession?.isLoggedIn && <CustomNavItem link="/dashboard" text="Tableau de bord" />}
-          </div>
+        {userSession?.roles === "superadmin" && 
+            <div className="nav-header-admin">
+                <CustomNavItem link="/dashboard" text="Tableau de bord" />
+                </div>
+        }
+        {userSession?.roles !== "superadmin" && 
+            <div className="nav-header">
+                    <CustomNavItem link="/services" text="Nos services" />
+                    <CustomNavItem link="/websites/new" text="Créer un site" />
+                    <CustomNavItem link="/contact" text="Contact" />
+                    {userSession?.isLoggedIn &&
+                    <CustomNavItem link="/dashboard" text="Tableau de bord" />
+                    }
+            </div>
+        }
 
           <LogInOutButton />
       </div>

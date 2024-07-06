@@ -131,7 +131,7 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
                     >
                         <Alert
                             onClose={handleClose}
-                            severity="error"
+                            severity={errorMessage.includes("Erreur") ? "error" : "success"}
                             variant="filled"
                             sx={{ width: '100%' }}
                         >{errorMessage}</Alert>

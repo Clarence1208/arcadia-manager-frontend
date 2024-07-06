@@ -3,6 +3,7 @@
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
+    height: 45vw;
 }
 
 #section-presentation img{
