@@ -294,7 +294,7 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     }
 
     if (isPageLoaded) {
-        if (!websites) {
+        if (websites.length === 0) {
             return <div>
                 <h2>Vous n'avez pas encore de site !</h2>
                 <h3>Créez-en un en cliquant sur le bouton "Créer un site"</h3>

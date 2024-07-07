@@ -13,6 +13,7 @@ import {UserSessionContext} from "../contexts/user-session";
 import {useNavigate} from "react-router-dom";
 import { uploadToS3 } from "../utils/s3";
 import Logo from '../images/logo-green.svg';
+import emailjs from "@emailjs/browser";
 
 type FormData = {
     firstName: string
@@ -25,6 +26,14 @@ type FormData = {
     dbUsername: string,
     dbPassword: string,
     associationName: string;
+}
+
+type User = {
+    id: number;
+    email: string;
+    firstName: string;
+    surname: string;
+    roles: string;
 }
 
 type WebsiteData = {
@@ -139,6 +148,20 @@ export function NewWebsite() {
         setOpen(false);
         setErrorMessage("");
     };
+
+    function sendWebsiteCreatedEmail(user: User, data: FormData) {
+        emailjs.send(import.meta.env.VITE_MAIL_SERVICE_ID, "template_b61dthv", {
+            emailTo: user.email,
+            userName: user.firstName + " " + user.surname,
+            associationName: data.associationName,
+            websiteURL: `https://${data.url}.arcadia-solution.com`,
+        }, import.meta.env.VITE_MAIL_PUBLIC_KEY)
+            .then((result) => {
+                console.log(result.text);
+            }, (error) => {
+                console.log(error.text);
+            });
+    }
 
     //If user already has an account and is logged in, don't need the user register form
     let forms = [
@@ -358,6 +381,24 @@ export function NewWebsite() {
         }
     };
 
+    const fetchUser = async (userId: number, userToken: string) => {
+        const bearer = "Bearer " + userToken;
+        const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}/withoutPassword`, {
+            headers: {
+                "Authorization": bearer,
+                "Content-Type": "application/json"
+            }
+        });
+        if (!response.ok) {
+            const error = await response.json()
+            setErrorMessage("Erreur : " + await error.message);
+            setOpen(true);
+            return
+        }
+        const res = await response.json();
+        return res;
+    }
+
     const fetchLogoFile = async (): Promise<File> => {
         const response = await fetch(Logo);
         const blob = await response.blob();
@@ -377,6 +418,7 @@ export function NewWebsite() {
         if (!isLastStep) return next()
 
         let userID;
+        let user;
         setWebsiteCreationProcess({...websiteCreationProcess, status: "Starting process"})
         if (!userSession?.isLoggedIn) {
             const userData = {
@@ -386,7 +428,7 @@ export function NewWebsite() {
                 password: data.password,
                 confirmPassword: data.confirmPassword
             }
-            const user = await createUser(userData)
+            user = await createUser(userData)
             if (!user) return
             userID = user.id
             setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
@@ -394,6 +436,7 @@ export function NewWebsite() {
         }
         else {
             userID = userSession?.userId
+            user = await fetchUser(userID as number, userSession?.loginToken)
         }
 
         const scriptData :WebsiteData = {
@@ -420,6 +463,8 @@ export function NewWebsite() {
             fileRef.current = await fetchLogoFile();
             uploadLogo();
         }
+
+        sendWebsiteCreatedEmail(user, data)
 
         await new Promise(r => setTimeout(r, 2000))
 

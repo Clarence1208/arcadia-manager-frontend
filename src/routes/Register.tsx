@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import {Footer} from "../components/Footer";
 import {Button, Paper} from "@mui/material";
 import {useNavigate} from "react-router-dom";
+import emailjs from "@emailjs/browser";
 
 type FormData = {
     firstName: string
@@ -38,6 +39,18 @@ export function Register() {
         })
     }
 
+    function sendEmail(userData: FormData) {
+        emailjs.send(import.meta.env.VITE_MAIL_SERVICE_ID, "template_thcq9qz", {
+            emailTo: userData.email,
+            userName: userData.firstName + " " + userData.surname,
+        }, import.meta.env.VITE_MAIL_PUBLIC_KEY)
+            .then((result) => {
+                console.log(result.text);
+            }, (error) => {
+                console.log(error.text);
+            });
+    }
+
     async function handleSubmit() {
 
         if (data.password !== data.confirmPassword) {
@@ -58,6 +71,7 @@ export function Register() {
             return
         }
         const res = await response.json();
+        sendEmail(data);
         navigate("/login?successMessage=true")
 
     }

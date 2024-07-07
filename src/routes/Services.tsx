@@ -14,7 +14,7 @@ export function Services() {
                             association</h3><br></br>
                         <h4>En 5 minutes, vous aurez accès à : </h4><br></br>
                         <ul>
-                            <li>Un nom de domaine personnalisé en [votreNomDeDOmaine].arcadia-solution.com</li><br></br><br></br>
+                            <li>Un nom de domaine personnalisé en [votreNomDeDomaine].arcadia-solution.com</li><br></br><br></br>
                             <li>Un site web personnalisable via un back office pour gérer vos contenus et administré le
                                 site
                             </li><br></br><br></br>

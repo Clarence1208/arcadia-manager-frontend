@@ -1,12 +1,13 @@
 import Header from "../components/Header";
 import {Footer} from "../components/Footer";
-import {SyntheticEvent, useContext, useState} from "react";
+import {SyntheticEvent, useContext, useEffect, useState} from "react";
 import {UserSessionContext} from "../contexts/user-session";
 import {WebsitesPanel} from "../components/features/dashboard/WebsitesPanel";
 import {UserAccountPanel} from "../components/features/dashboard/UserAccountPanel";
 import {Tab, Tabs} from "@mui/material";
 import "../styles/Dashboard.css";
 import { UsersPanel } from "../components/features/dashboard/UsersPanel";
+import { Navigate, useNavigate } from "react-router-dom";
 
 
 //tabs comes from MUI API docs https://mui.com/material-ui/react-tabs/
@@ -39,11 +40,17 @@ function TabPanel(props: any) {
 export function Dashboard(){
     const userSession = useContext(UserSessionContext)?.userSession
     const [tabsValue, setTabsValue] = useState(0);
+    let navigate = useNavigate();
 
     const handleChange = (event: SyntheticEvent, newValue: number) => {
         setTabsValue(newValue);
         event.currentTarget.className = "active"; //doesn't seem to work as intended
     };
+
+    if (!userSession?.isLoggedIn) {
+        navigate('/login')
+    }
+
     return (
         <div>
             <Header />
