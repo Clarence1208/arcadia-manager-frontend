@@ -2,8 +2,9 @@
 import {Alert, Collapse, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from "@mui/material";
 import '../../../styles/App.css';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useState } from "react";
-
+import {useEffect, useState} from "react";
+import { Stripe, StripeElements} from "@stripe/stripe-js";
+import {PaymentElement, useElements, useStripe} from "@stripe/react-stripe-js";
 
 type RecapData = {
     firstName: string
@@ -15,6 +16,8 @@ type RecapData = {
     dbUsername: string,
     dbPassword: string,
     associationName: string
+    stripe?: Stripe,
+    elements?: StripeElements
 }
 
 type RecapProps = RecapData & {
@@ -25,11 +28,17 @@ type RecapProps = RecapData & {
     handleClose: () => void,
     open: boolean
 }
+type Product = {
+    id: string,
+    price: number,
+    name: string
+}
 
 export function RecapForm(props: RecapProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showAdminPassword, setShowAdminPassword] = useState(false);
+    const [product, setProduct] = useState<Product | null>(null);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
     const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
@@ -40,7 +49,30 @@ export function RecapForm(props: RecapProps) {
         event.preventDefault();
       };
 
+    const getProductInfo = async () => {
+        return {
+            id: "prod_QTPPLAZFRAHAbA",
+            price: 1099,
+            name: "Maintenance Site Web"
+        }
+    }
+    const stripe = useStripe();
+    const elements = useElements();
+
+    useEffect(() => {
+        getProductInfo().then((data) => {
+            setProduct(data);
+        });
+        if (stripe && elements) {
+            console.log("Stripe and elements loaded")
+            props.updateFields({stripe: stripe, elements: elements});
+        }else{
+            console.log("Stripe or elements not loaded")
+        }
+    },[]);
+
     return (
+        <div>
         <div className="form-base">
             <h1>{props.formTitle}</h1>
             <p>{props.formDescription}</p>
@@ -128,6 +160,14 @@ export function RecapForm(props: RecapProps) {
                         />
                     </div>
                 </div>
+            </div>
+        </div>
+            <div style={{marginTop: "4em"}}>
+                <h3>Paiement de l'abonnement mensuel</h3>
+                {
+                    product && (<p>{product.name} - <b>{product.price/100}€</b></p>)
+                }
+                <PaymentElement/>
             </div>
         </div>
     )

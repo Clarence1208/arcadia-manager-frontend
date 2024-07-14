@@ -7,6 +7,7 @@ export interface IUserSession {
     backPage: string;
     loginToken: string;
     roles: string;
+    customerId?: string;
 }
 
 interface IUserSessionContext {

@@ -14,6 +14,8 @@ import {useNavigate} from "react-router-dom";
 import { uploadToS3 } from "../utils/s3";
 import Logo from '../images/logo-green.svg';
 import emailjs from "@emailjs/browser";
+import {Elements, useElements, useStripe} from "@stripe/react-stripe-js";
+import {ConfirmationToken, loadStripe, Stripe, StripeElements, StripeElementsOptions} from "@stripe/stripe-js";
 
 type FormData = {
     firstName: string
@@ -26,6 +28,10 @@ type FormData = {
     dbUsername: string,
     dbPassword: string,
     associationName: string;
+    stripe?: Stripe;
+    elements?: StripeElements;
+    priceId?: string;
+    customerId?: string;
 }
 
 type User = {
@@ -54,7 +60,9 @@ const body: FormData = {
     url: "",
     dbUsername: "",
     dbPassword: "",
-    associationName: ""
+    associationName: "",
+    priceId:"price_1PcSauBvbnM6p69y2trJmBzR",
+    customerId: "",
 }
 
 type Website = {
@@ -80,6 +88,16 @@ export function NewWebsite() {
     const specialChars = /[\[\];§¨£µ=+°\-'~²_`!@#$%^&*(),.?":{}|<>\/\\éèàëêôâîûüäùö]/;
     const [websites, setWebsites] = useState<Website[]>([])  
     const [isWebsiteNameTaken, setIsWebsiteNameTaken] = useState(false)
+
+    // Stripe configuration
+    const stripePromise = loadStripe("pk_test_51PPPaZBvbnM6p69y9VGLCmAkev3tT3Plbw8JPtnf78iiJxiGtsTXNPOEPn3M9OktpiKeuTqx1XwcoKoVUty97nr600GCnOjcBt");
+    const stripeOptions: StripeElementsOptions = {
+        mode: 'subscription',
+        amount: 1099,
+        currency: 'eur',
+        paymentMethodCreation: 'manual',
+    };
+
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>|null, action: boolean) => {
         if (action) {
@@ -115,7 +133,6 @@ export function NewWebsite() {
 
     function updateFields(fields: Partial<FormData>) {
         if (fields.url) {
-            console.log(fields.url)
             fields.url = fields.url.toLowerCase();
             if (specialChars.test(fields.url)) {
                 setErrorMessage("L'URL ne doit pas contenir de caractères spéciaux");
@@ -124,9 +141,8 @@ export function NewWebsite() {
             }
             setIsWebsiteNameTaken(false);
             for (const website of websites) {
-                console.log(website.url)
+
                 if (website.url === fields.url) {
-                    console.log("Website name taken")
                     setIsWebsiteNameTaken(true);
                     setErrorMessage("L'URL est déjà utilisée");
                     setOpen(true);
@@ -173,8 +189,9 @@ export function NewWebsite() {
         <RecapForm {...data} updateFields={updateFields} formError={errorMessage} formTitle="Récapitulatif des données" handleClose={handleClose} open={open}
                    formDescription="Attention certaines informations ne pourront pas être modifiées ultèrieurement."/>
     ]
-    if (userSession?.isLoggedIn) {
+    if (userSession?.isLoggedIn ) {
         forms = forms.slice(1, 2)
+        console.log("User is logged in")
     }
     const {steps, currentStepIndex, step, isFirstStep, isLastStep, back, next} = useMultiStepForm(forms)
 
@@ -203,9 +220,13 @@ export function NewWebsite() {
     }
 
     async function logInUser(email: string, password: string) {
+        const inputBOdy = {
+            email: email,
+            password: password
+        }
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/users/login", {
             method: "POST",
-            body: JSON.stringify(data),
+            body: JSON.stringify(inputBOdy),
             headers: {"Content-Type": "application/json"}
         });
         if (!response.ok) {
@@ -216,12 +237,22 @@ export function NewWebsite() {
         }
         setErrorMessage("");
         const res = await response.json();
+        console.log(res.customerId);
+        setData(prev => {
+            return {...prev,
+            ...{
+                customerId: res.customerId
+            }
+        }});
         if (userSessionContext) {
             userSessionContext.updateUserSession({
                 userId: res.id, loginToken: res.loginToken,
-                fullName: res.firstName + " " + res.surname, isLoggedIn: true
+                fullName: res.firstName + " " + res.surname, isLoggedIn: false, //to allow the forms to stay as is.
+                roles: res.roles, customerId: res.customerId
             })
         }
+        console.log(userSession);
+        console.log(userSessionContext?.userSession);
     }
 
     async function deployWesbite(scriptData: WebsiteData, websiteDataDB: Partial<FormData>) {
@@ -406,6 +437,54 @@ export function NewWebsite() {
         return file;
       };
 
+    const createSubscription = async (userToken: string) => {
+        //STRIPE PAYMENT METHOD
+        // Create the ConfirmationToken using the details collected by the Payment Element
+        // and additional shipping information
+        if (!data.stripe || !data.elements || !userSessionContext) {
+            return;
+        }
+
+        const elements = data.elements;
+        const {error, confirmationToken} = await data.stripe.createConfirmationToken({
+                elements
+            }
+        );
+        if (error) {
+            setErrorMessage("Erreur lors de la création de l'abonnement: " + error);
+            setOpen(true);
+            return;
+        }
+
+        const bearer = "Bearer " + userToken;
+
+        console.log(data)
+        const inputBody ={
+            priceId: data.priceId,
+            customerId: data.customerId,
+            confirmationTokenId: confirmationToken.id,
+        }
+        console.log(
+            inputBody
+        )
+        const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/stripe/subscriptions`, {
+            headers: {
+                "Authorization": bearer,
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify(inputBody)
+        });
+        if (!response.ok) {
+            const error = await response.json()
+            setErrorMessage("Erreur : " + await error.message);
+            setOpen(true);
+            return;
+        }
+        const res = await response.json();
+        console.log(res);
+        return res;
+    }
     async function onSubmit(e: FormEvent) {
         e.preventDefault()
 
@@ -420,6 +499,16 @@ export function NewWebsite() {
         let userID;
         let user;
         setWebsiteCreationProcess({...websiteCreationProcess, status: "Starting process"})
+
+        if (data.elements) {
+            const {error: submitError} = await data.elements?.submit();
+            if (submitError) {
+                console.log(submitError)
+                setErrorMessage("Erreur lors de la création de l'abonnement: " + submitError);
+                setOpen(true);
+                return;
+            }
+        }
         if (!userSession?.isLoggedIn) {
             const userData = {
                 firstName: data.firstName,
@@ -432,13 +521,22 @@ export function NewWebsite() {
             if (!user) return
             userID = user.id
             setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
-            await logInUser(data.email, data.password);
+            const loggedUser= await logInUser(data.email, data.password);
         }
         else {
             userID = userSession?.userId
             user = await fetchUser(userID as number, userSession?.loginToken)
         }
 
+       if (!userSessionContext) return
+
+        const res = await createSubscription(userSessionContext?.userSession?.loginToken);
+        if (res.error) {
+            setErrorMessage("Erreur lors de la création de l'abonnement: " + res.error.message);
+            setOpen(true);
+            return;
+        }
+        //WEBSITE CREATION PROCESS
         const scriptData :WebsiteData = {
             subDomain: data.url,
             name: data.dbUsername,
@@ -507,7 +605,9 @@ export function NewWebsite() {
                             <div style={{position: "absolute", top: ".5rem", right: ".5rem"}}>
                                 Etape {currentStepIndex + 1} / {steps.length}
                             </div>
-                            {step}
+                            <Elements stripe={stripePromise} options={stripeOptions}>
+                                {step}
+                            </Elements>
                             <div style={{
                                 marginTop: "1rem",
                                 display: "flex",

@@ -41,8 +41,6 @@ function LogInOutButton() {
 export default function Header() {
 
     const userSession = useContext(UserSessionContext)?.userSession;
-    console.log(userSession)
-
     return (
         <div>
       <div className="main-header">

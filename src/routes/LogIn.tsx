@@ -62,7 +62,7 @@ function LogInForm() {
                 sessionContext.updateUserSession({
                     userId: res.id, loginToken: res.loginToken,
                     fullName: res.firstName + " " + res.surname, isLoggedIn: true,
-                    roles: res.roles
+                    roles: res.roles, customerId: res.customerId
                 })
             }
         } catch (e) {
