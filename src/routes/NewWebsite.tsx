@@ -31,7 +31,6 @@ type FormData = {
     stripe?: Stripe;
     elements?: StripeElements;
     priceId?: string;
-    customerId?: string;
 }
 
 type User = {
@@ -61,8 +60,7 @@ const body: FormData = {
     dbUsername: "",
     dbPassword: "",
     associationName: "",
-    priceId:"price_1PcSauBvbnM6p69y2trJmBzR",
-    customerId: "",
+    priceId:"price_1PdKGhBvbnM6p69ye4fbiWco", //default value test =price_1PcSauBvbnM6p69y2trJmBzR and default value prod= price_1PdKGhBvbnM6p69ye4fbiWco
 }
 
 type Website = {
@@ -90,7 +88,7 @@ export function NewWebsite() {
     const [isWebsiteNameTaken, setIsWebsiteNameTaken] = useState(false)
 
     // Stripe configuration
-    const stripePromise = loadStripe("pk_test_51PPPaZBvbnM6p69y9VGLCmAkev3tT3Plbw8JPtnf78iiJxiGtsTXNPOEPn3M9OktpiKeuTqx1XwcoKoVUty97nr600GCnOjcBt");
+    const stripePromise = loadStripe("pk_live_51PPPaZBvbnM6p69y7vH2KFYTrszO7Mu94ZlkdSl2hJqk4nJszkBoCEM26kytyJLg1Wk4W6YJ33YwjUjcaenutVqj005pVjqnpO");
     const stripeOptions: StripeElementsOptions = {
         mode: 'subscription',
         amount: 1099,
@@ -212,49 +210,13 @@ export function NewWebsite() {
             const error = await response.json()
             setErrorMessage("Erreur lors de la création du compte: " + await error.message);
             setOpen(true);
-            setWebsiteCreationProcess({...websiteCreationProcess, status: "done"})
-            return
+            setWebsiteCreationProcess({...websiteCreationProcess, status: "done"});
+            return;
         }
         const res = await response.json();
+        console.log(res)
         return res
     }
-
-    async function logInUser(email: string, password: string) {
-        const inputBOdy = {
-            email: email,
-            password: password
-        }
-        const response: Response = await fetch(import.meta.env.VITE_API_URL + "/users/login", {
-            method: "POST",
-            body: JSON.stringify(inputBOdy),
-            headers: {"Content-Type": "application/json"}
-        });
-        if (!response.ok) {
-            const error = await response.json()
-            setErrorMessage("Erreur : " + await error.message);
-            setOpen(true);
-            return
-        }
-        setErrorMessage("");
-        const res = await response.json();
-        console.log(res.customerId);
-        setData(prev => {
-            return {...prev,
-            ...{
-                customerId: res.customerId
-            }
-        }});
-        if (userSessionContext) {
-            userSessionContext.updateUserSession({
-                userId: res.id, loginToken: res.loginToken,
-                fullName: res.firstName + " " + res.surname, isLoggedIn: false, //to allow the forms to stay as is.
-                roles: res.roles, customerId: res.customerId
-            })
-        }
-        console.log(userSession);
-        console.log(userSessionContext?.userSession);
-    }
-
     async function deployWesbite(scriptData: WebsiteData, websiteDataDB: Partial<FormData>) {
 
         setWebsiteCreationProcess({
@@ -298,7 +260,7 @@ export function NewWebsite() {
         })
         await deployNGINX(scriptData);
         //wait a bit
-        await new Promise(r => setTimeout(r, 2000))
+        await new Promise(r => setTimeout(r, 1000))
 
 
         setWebsiteCreationProcess({
@@ -437,7 +399,35 @@ export function NewWebsite() {
         return file;
       };
 
-    const createSubscription = async (userToken: string) => {
+    async function logInUser(email: string, password: string) {
+        const inputBOdy = {
+            email: email,
+            password: password
+        }
+        const response: Response = await fetch(import.meta.env.VITE_API_URL + "/users/login", {
+            method: "POST",
+            body: JSON.stringify(inputBOdy),
+            headers: {"Content-Type": "application/json"}
+        });
+        if (!response.ok) {
+            const error = await response.json()
+            setErrorMessage("Erreur : " + await error.message);
+            setOpen(true);
+            return
+        }
+        setErrorMessage("");
+        const res = await response.json();
+
+        if (userSessionContext) {
+            userSessionContext.updateUserSession({
+                userId: res.id, loginToken: res.loginToken,
+                fullName: res.firstName + " " + res.surname, isLoggedIn: false, //to allow the forms to stay as is.
+                roles: res.roles, customerId: res.customerId
+            })
+        }
+    }
+
+    const createSubscription = async (userToken: string, customerId: string) => {
         //STRIPE PAYMENT METHOD
         // Create the ConfirmationToken using the details collected by the Payment Element
         // and additional shipping information
@@ -458,15 +448,11 @@ export function NewWebsite() {
 
         const bearer = "Bearer " + userToken;
 
-        console.log(data)
         const inputBody ={
             priceId: data.priceId,
-            customerId: data.customerId,
+            customerId: customerId,
             confirmationTokenId: confirmationToken.id,
         }
-        console.log(
-            inputBody
-        )
         const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/stripe/subscriptions`, {
             headers: {
                 "Authorization": bearer,
@@ -482,9 +468,9 @@ export function NewWebsite() {
             return;
         }
         const res = await response.json();
-        console.log(res);
         return res;
     }
+
     async function onSubmit(e: FormEvent) {
         e.preventDefault()
 
@@ -503,7 +489,6 @@ export function NewWebsite() {
         if (data.elements) {
             const {error: submitError} = await data.elements?.submit();
             if (submitError) {
-                console.log(submitError)
                 setErrorMessage("Erreur lors de la création de l'abonnement: " + submitError);
                 setOpen(true);
                 return;
@@ -528,11 +513,12 @@ export function NewWebsite() {
             user = await fetchUser(userID as number, userSession?.loginToken)
         }
 
-       if (!userSessionContext) return
+       if (!userSessionContext) return;
 
-        const res = await createSubscription(userSessionContext?.userSession?.loginToken);
+        const cusId = user.stripeCustomerId
+        const res = await createSubscription(userSessionContext?.userSession?.loginToken, cusId);
         if (res.error) {
-            setErrorMessage("Erreur lors de la création de l'abonnement: " + res.error.message);
+            setErrorMessage(res.error.message);
             setOpen(true);
             return;
         }

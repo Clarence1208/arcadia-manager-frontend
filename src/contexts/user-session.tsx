@@ -7,7 +7,7 @@ export interface IUserSession {
     backPage: string;
     loginToken: string;
     roles: string;
-    customerId?: string;
+    customerId: string;
 }
 
 interface IUserSessionContext {
@@ -28,6 +28,7 @@ export const UserSessionProvider: FC<IProps> = ({ children }) => {
         backPage: "",
         loginToken: "",
         roles: "",
+        customerId: "",
     });
 
     useEffect(() => {

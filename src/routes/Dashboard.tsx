@@ -8,6 +8,7 @@ import {Tab, Tabs} from "@mui/material";
 import "../styles/Dashboard.css";
 import { UsersPanel } from "../components/features/dashboard/UsersPanel";
 import { Navigate, useNavigate } from "react-router-dom";
+import InvoicesPanel from "../components/features/dashboard/InvoicesPanel";
 
 
 //tabs comes from MUI API docs https://mui.com/material-ui/react-tabs/
@@ -46,10 +47,13 @@ export function Dashboard(){
         setTabsValue(newValue);
         event.currentTarget.className = "active"; //doesn't seem to work as intended
     };
+    useEffect(() => {
 
-    if (!userSession?.isLoggedIn) {
-        navigate('/login')
-    }
+        if (!userSession?.isLoggedIn) {
+            navigate('/login')
+        }
+
+    }, []);
 
     return (
         <div>
@@ -91,7 +95,7 @@ export function Dashboard(){
                             <UserAccountPanel userId={userSession?.userId} userToken={userSession?.loginToken} />
                         </TabPanel>
                     <TabPanel value={tabsValue} index={2}>
-                        <h2>Mon historique de paiement</h2>
+                        <InvoicesPanel />
                     </TabPanel>
                     {userSession?.roles === "superadmin" &&
                         <TabPanel value={tabsValue} index={0}>
