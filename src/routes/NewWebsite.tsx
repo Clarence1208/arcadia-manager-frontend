@@ -91,7 +91,7 @@ export function NewWebsite() {
     const stripePromise = loadStripe("pk_live_51PPPaZBvbnM6p69y7vH2KFYTrszO7Mu94ZlkdSl2hJqk4nJszkBoCEM26kytyJLg1Wk4W6YJ33YwjUjcaenutVqj005pVjqnpO");
     const stripeOptions: StripeElementsOptions = {
         mode: 'subscription',
-        amount: 1099,
+        amount: 50,
         currency: 'eur',
         paymentMethodCreation: 'manual',
     };

@@ -391,7 +391,7 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
                                             <TableCell style={{color: user.roles === "user"? "green": "red"}} align="right">{user.roles}</TableCell>
                                                 <TableCell align="center">
                                                 {user.websites.length !== 0 &&
-                                                    <Button title={"Voir l'image"} onClick={() => openWebsiteModal(user)}>{
+                                                    <Button title={"Voir les sites"} onClick={() => openWebsiteModal(user)}>{
                                                         <WebIcon/>}
                                                     </Button>
                                                 }

@@ -52,7 +52,7 @@ export function RecapForm(props: RecapProps) {
     const getProductInfo = async () => {
         return {
             id: "prod_QTPPLAZFRAHAbA",
-            price: 1099,
+            price: 50,
             name: "Maintenance Site Web"
         }
     }
