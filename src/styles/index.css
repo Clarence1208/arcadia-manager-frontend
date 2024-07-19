@@ -2,6 +2,7 @@ body {
   margin: 0;
   font-family: Lato, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
   -moz-osx-font-smoothing: grayscale;
 
   display: flex;

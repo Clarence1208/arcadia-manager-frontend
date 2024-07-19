@@ -11,7 +11,6 @@ export function Contact() {
     return (
         <div>
             <Header/>
-            <div className="main">
                 <div className={"main"}>
                     <div>
                         <h2>Contactez-nous</h2>
@@ -45,7 +44,6 @@ export function Contact() {
                     </ul>
                 </div>
             <Footer/>
-        </div>
         </div>
     );
 }

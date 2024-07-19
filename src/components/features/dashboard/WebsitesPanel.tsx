@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {AddCircleOutline, Delete, Edit} from "@mui/icons-material";
 import {Alert, Button, CircularProgress, Link, Modal, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import { listFilesS3 } from "../../../utils/s3";
@@ -6,6 +6,8 @@ import { _Object } from "@aws-sdk/client-s3";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { UserSessionContext } from "../../../contexts/user-session";
+import { useNavigate } from "react-router-dom";
 
 type Website = {
     id: number;
@@ -31,74 +33,93 @@ export function WebsitesPanel({userId, userToken}: WebsitesPanelProps){
     const [currentWebsite, setCurrentWebsite] = useState<Website | null>(null);
     const [openDeleteAlertModal, setOpenDeleteAlertModal] = useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const userSession = useContext(UserSessionContext)?.userSession;
     const [changeOnPage, setChangeOnPage] = useState<boolean>(false);
+    let navigate = useNavigate();
     
-    useEffect(() => {
-        if (websiteLoaded) {
-            setTimeout(() => {
-                setIsPageLoaded(true);
-            }, 200);
-        }
-    }, [websiteLoaded]);
-
-    useEffect(() => {
-            if (userToken && userId) {
-                const getWebsites = async (filters: WebsitesFilters): Promise<Website[]> => {
-                    const bearer = "Bearer " + userToken;
-                    const response: Response = await fetch(`${import.meta.env.VITE_API_URL}/websites?userId=${userId}`, {
-                        headers: {
-                            "Authorization": bearer,
-                            "Content-Type": "application/json"
-                        }
-                    });
-                    if (!response.ok) {
-                        const error = await response.json()
-                        setErrorMessage("Erreur : " + await error.message);
-                        return []
-                    }
-                    const res = await response.json();
-                    if (res.length === 0) {
-                        setErrorMessage("Aucun site web trouvé")
-                    }
-                    return res;
-                }
-                getWebsites({userId: userId}).then(setWebsites).then(() => setWebsiteLoaded(true));
+  // Load websites when userToken or userId changes
+  useEffect(() => {
+    if (userToken && userId) {
+      const getWebsites = async (): Promise<Website[]> => {
+        const bearer = "Bearer " + userToken;
+        try {
+          const response: Response = await fetch(
+            `${import.meta.env.VITE_API_URL}/websites?userId=${userId}`,
+            {
+              headers: {
+                Authorization: bearer,
+                "Content-Type": "application/json",
+              },
             }
+          );
+
+          if (!response.ok) {
+            const error = await response.json();
+            setErrorMessage("Erreur : " + error.message);
+            return [];
+          }
+
+          const res = await response.json();
+          if (res.length === 0) {
+            setErrorMessage("Aucun site web trouvé");
+          }
+          setWebsiteLoaded(true);
+          return res;
+        } catch (error) {
+          setErrorMessage("Erreur : " + error);
+          return [];
         }
-    , [userToken, userId])
+      };
 
+      getWebsites().then(setWebsites);
+    }
+  }, [userToken, userId]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const fileList = await listFilesS3();
-                const websitesWithLogos = [...websites];
+  // Fetch S3 files and associate logos with websites
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!websiteLoaded) return;
 
-                if (fileList?.Contents) {
-                    for (const value of fileList.Contents) {
-                        if (!value?.Key) continue;
+      try {
+        const fileList = await listFilesS3();
+        const websitesWithLogos = [...websites];
 
-                        const check = value.Key.split("/");
-                        for (const website of websitesWithLogos) {
-                            if (
-                                check[0] === website.associationName &&
-                                check[1] === "common" &&
-                                check[2].startsWith("logo-")
-                            ) {
-                                website.logo = `https://arcadia-bucket.s3.eu-west-3.amazonaws.com/${value.Key}`;
-                            }
-                        }
-                    }
-                }
-                setWebsites(websitesWithLogos);
-            } catch (error) {
-                console.error('List error:', error);
-                setErrorMessage("Erreur : " + error);
-                setOpen(true);
+        if (fileList?.Contents) {
+          for (const value of fileList.Contents) {
+            if (!value?.Key) continue;
+
+            const check = value.Key.split("/");
+            for (const website of websitesWithLogos) {
+              if (
+                check[0] === website.associationName &&
+                check[1] === "common" &&
+                check[2].startsWith("logo-")
+              ) {
+                website.logo = `https://arcadia-bucket.s3.eu-west-3.amazonaws.com/${value.Key}`;
+              }
             }
-        };
-        fetchData();
-    }, [websiteLoaded]);
+          }
+        }
+        setWebsites(websitesWithLogos);
+      } catch (error) {
+        setErrorMessage("Erreur : " + error);
+        setOpen(true);
+      }
+    };
+
+    fetchData();
+  }, [websiteLoaded]);
+
+  useEffect(() => {
+    if (websiteLoaded) {
+      setTimeout(() => {
+        setIsPageLoaded(true);
+        if (!userSession?.isLoggedIn) {
+            navigate("/login");
+        }
+      }, 300);
+    }
+  }, [websiteLoaded]);
 
     const handleClose = () => {
         setOpen(false);
