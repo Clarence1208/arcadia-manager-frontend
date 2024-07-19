@@ -431,16 +431,16 @@ export function NewWebsite() {
         //STRIPE PAYMENT METHOD
         // Create the ConfirmationToken using the details collected by the Payment Element
         // and additional shipping information
-        if (!data.stripe || !data.elements || !userSessionContext) {
+        /*if (!data.stripe || !data.elements || !userSessionContext) {
             return {
                 error: {
                     message: "Missing stripe or elements or userSessionContext"
                 }
             };
-        }
+        }*/
         //PROD TESTING:
-        /*return {"message": "fake answer for testing"}*/
-        const elements = data.elements;
+        return {"message": "fake answer for testing"}
+        /*const elements = data.elements;
         const {error, confirmationToken} = await data.stripe.createConfirmationToken({
                 elements
             }
@@ -473,7 +473,7 @@ export function NewWebsite() {
             return;
         }
         const res = await response.json();
-        return res;
+        return res;*/
     }
 
     async function onSubmit(e: FormEvent) {
@@ -521,12 +521,13 @@ export function NewWebsite() {
 
        if (!userSessionContext) return;
         const cusId = user.stripeCustomerId
-        const res = await createSubscription(userSessionContext?.userSession?.loginToken, cusId);
-        if (res.error) {
+
+        //const res = await createSubscription(userSessionContext?.userSession?.loginToken, cusId);
+        /*if (res.error) {
             setErrorMessage(res.error.message);
             setOpen(true);
             return;
-        }
+        }*/
         //WEBSITE CREATION PROCESS
         const scriptData :WebsiteData = {
             subDomain: data.url,
