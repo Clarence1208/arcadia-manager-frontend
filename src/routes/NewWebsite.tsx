@@ -521,13 +521,14 @@ export function NewWebsite() {
 
        if (!userSessionContext) return;
 
-        const cusId = user.stripeCustomerId
+        console.log(userSession);
+        /*const cusId = user.stripeCustomerId
         const res = await createSubscription(userSessionContext?.userSession?.loginToken, cusId);
         if (res.error) {
             setErrorMessage(res.error.message);
             setOpen(true);
             return;
-        }
+        }*/
         //WEBSITE CREATION PROCESS
         const scriptData :WebsiteData = {
             subDomain: data.url,
@@ -558,6 +559,11 @@ export function NewWebsite() {
 
         await new Promise(r => setTimeout(r, 2000))
 
+        if (userSessionContext) {
+            userSessionContext.updateUserSession({
+                isLoggedIn: true
+            })
+        }
         navigate("/dashboard")
     }
 
