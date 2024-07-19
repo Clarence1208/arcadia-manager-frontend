@@ -432,9 +432,15 @@ export function NewWebsite() {
         // Create the ConfirmationToken using the details collected by the Payment Element
         // and additional shipping information
         if (!data.stripe || !data.elements || !userSessionContext) {
-            return;
+            return {
+                error: {
+                    message: "Missing stripe or elements or userSessionContext"
+                }
+            };
         }
-
+        //PROD TESTING:
+        return {"message": "fake answer for testing"}
+/*
         const elements = data.elements;
         const {error, confirmationToken} = await data.stripe.createConfirmationToken({
                 elements
@@ -468,7 +474,7 @@ export function NewWebsite() {
             return;
         }
         const res = await response.json();
-        return res;
+        return res;*/
     }
 
     async function onSubmit(e: FormEvent) {
