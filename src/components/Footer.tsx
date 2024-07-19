@@ -7,9 +7,7 @@ export function Footer() {
             <div className="footer-content">
                 <img src={Logo} alt={"logo"} />
                 <div className="raccourcis">
-                    <a href="/">Mentions légales</a>
-                    <a href="/">CGU</a>
-                    <a href="/">Contact</a>
+                    <a href="/contact">Contact</a>
                 </div>
                <div>{"2024"}</div>
                 <p>Ce site est destiné aux gérants d'association orientée médicale souhaitant créer un site web et l'heberger rapidement. Arcadia Solutions. Il s’agit d’une entreprise fictive. By HILDERAL - HIRSCH - RUTH @ ESGI PARIS

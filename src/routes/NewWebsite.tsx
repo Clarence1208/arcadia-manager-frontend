@@ -439,8 +439,7 @@ export function NewWebsite() {
             };
         }
         //PROD TESTING:
-        return {"message": "fake answer for testing"}
-/*
+        /*return {"message": "fake answer for testing"}*/
         const elements = data.elements;
         const {error, confirmationToken} = await data.stripe.createConfirmationToken({
                 elements
@@ -474,7 +473,7 @@ export function NewWebsite() {
             return;
         }
         const res = await response.json();
-        return res;*/
+        return res;
     }
 
     async function onSubmit(e: FormEvent) {
@@ -512,6 +511,7 @@ export function NewWebsite() {
             if (!user) return
             userID = user.id
             setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
+            await new Promise(r => setTimeout(r, 1000));
             const loggedUser= await logInUser(data.email, data.password);
         }
         else {
@@ -520,15 +520,13 @@ export function NewWebsite() {
         }
 
        if (!userSessionContext) return;
-
-        console.log(userSession);
-        /*const cusId = user.stripeCustomerId
+        const cusId = user.stripeCustomerId
         const res = await createSubscription(userSessionContext?.userSession?.loginToken, cusId);
         if (res.error) {
             setErrorMessage(res.error.message);
             setOpen(true);
             return;
-        }*/
+        }
         //WEBSITE CREATION PROCESS
         const scriptData :WebsiteData = {
             subDomain: data.url,
