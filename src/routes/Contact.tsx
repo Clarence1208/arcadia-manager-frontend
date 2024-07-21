@@ -29,7 +29,7 @@ export function Contact() {
                         <p>+33 1 23 45 67 89</p>
                     </div>
                     <h2>Formulaire de Contact</h2>
-                    <form className={"form"} onSubmit={contactUs}>
+                    <form className={"form-contact"} onSubmit={contactUs}>
                         <div className={"contact-form-fields"}>
                         <TextField name={"name"} label={"Nom"} variant={"outlined"} className="contact-form-field"/>
                         <TextField name={"email"} label={"Email"} variant={"outlined"} className="contact-form-field"/>

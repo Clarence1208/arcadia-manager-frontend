@@ -5,7 +5,14 @@
     margin-top: 20px;
   }
   
-  .contact-form-field {
-    width: 25vw !important;
-    margin-bottom: 2vh !important;
-  }
+.contact-form-field {
+  width: 25vw !important;
+  margin-bottom: 2vh !important;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 40vw;
+  justify-content: space-around;
+}
