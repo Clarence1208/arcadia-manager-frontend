@@ -190,17 +190,15 @@ export function NewWebsite() {
                    formDescription="Attention certaines informations ne pourront pas être modifiées ultèrieurement."/>
     ]
     if (userSession?.isLoggedIn ) {
-        forms = forms.slice(1, 2)
-        console.log("User is logged in")
+        forms = forms.slice(1, 2);
     }
     const {steps, currentStepIndex, step, isFirstStep, isLastStep, back, next} = useMultiStepForm(forms)
-
 
     async function createUser(userData:Partial<FormData>) {
         if (userData.password !== userData.confirmPassword) {
             setErrorMessage("Les mots de passe ne correspondent pas");
             setOpen(true);
-            return
+            return;
         }
         delete userData.confirmPassword;
         const response: Response = await fetch(import.meta.env.VITE_API_URL + "/users/register", {
@@ -227,7 +225,7 @@ export function NewWebsite() {
         })
 
         const website = await createWebsite(websiteDataDB);
-        await new Promise(r => setTimeout(r, 1000))
+        await new Promise(r => setTimeout(r, 1000));
 
         setWebsiteCreationProcess({
             ...websiteCreationProcess,
@@ -236,7 +234,6 @@ export function NewWebsite() {
         })
         await deployDomain(scriptData);
         await new Promise(r => setTimeout(r, 1000))
-
 
         setWebsiteCreationProcess({
             ...websiteCreationProcess,
@@ -369,7 +366,6 @@ export function NewWebsite() {
         try {
             await uploadToS3(fileRef.current!, key);
         } catch (error) {
-            console.error("Error uploading logo: ", error);
             setErrorMessage("Erreur lors du chargement du logo: " + error);
             setOpen(true);
         }
@@ -432,16 +428,16 @@ export function NewWebsite() {
         //STRIPE PAYMENT METHOD
         // Create the ConfirmationToken using the details collected by the Payment Element
         // and additional shipping information
-        /*if (!data.stripe || !data.elements || !userSessionContext) {
+        if (!data.stripe || !data.elements || !userSessionContext) {
             return {
                 error: {
                     message: "Missing stripe or elements or userSessionContext"
                 }
             };
-        }*/
+        }
         //PROD TESTING:
-        return {"message": "fake answer for testing"}
-        /*const elements = data.elements;
+        //return {"message": "fake answer for testing"}
+        const elements = data.elements;
         const {error, confirmationToken} = await data.stripe.createConfirmationToken({
                 elements
             }
@@ -474,7 +470,7 @@ export function NewWebsite() {
             return;
         }
         const res = await response.json();
-        return res;*/
+        return res;
     }
 
     async function onSubmit(e: FormEvent) {
@@ -524,12 +520,12 @@ export function NewWebsite() {
        if (!userSessionContext) return;
         const cusId = user.stripeCustomerId
 
-        //const res = await createSubscription(userSessionContext?.userSession?.loginToken, cusId);
-        /*if (res.error) {
+        const res = await createSubscription(userSessionContext?.userSession?.loginToken, cusId);
+        if (res.error) {
             setErrorMessage(res.error.message);
             setOpen(true);
             return;
-        }*/
+        }
         //WEBSITE CREATION PROCESS
         const scriptData :WebsiteData = {
             subDomain: data.url,
