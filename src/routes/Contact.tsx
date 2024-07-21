@@ -1,5 +1,5 @@
-import Header from "./components/Header";
-import {Footer} from "./components/Footer";
+import Header from "../components/Header";
+import {Footer} from "../components/Footer";
 import {Button, TextField} from "@mui/material";
 import '../styles/Contact.css';
 
