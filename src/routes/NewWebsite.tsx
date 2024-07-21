@@ -163,6 +163,13 @@ export function NewWebsite() {
         setErrorMessage("");
     };
 
+    function sendEmail(user: User) {
+        emailjs.send(import.meta.env.VITE_MAIL_SERVICE_ID, "template_thcq9qz", {
+            emailTo: user.email,
+            userName: user.firstName + " " + user.surname,
+        }, import.meta.env.VITE_MAIL_PUBLIC_KEY)
+    }
+
     function sendWebsiteCreatedEmail(user: User, data: FormData) {
         emailjs.send(import.meta.env.VITE_MAIL_SERVICE_ID, "template_b61dthv", {
             emailTo: user.email,
@@ -170,11 +177,6 @@ export function NewWebsite() {
             associationName: data.associationName,
             websiteURL: `https://${data.url}.arcadia-solution.com`,
         }, import.meta.env.VITE_MAIL_PUBLIC_KEY)
-            .then((result) => {
-                console.log(result.text);
-            }, (error) => {
-                console.log(error.text);
-            });
     }
 
     //If user already has an account and is logged in, don't need the user register form
@@ -214,7 +216,6 @@ export function NewWebsite() {
             return;
         }
         const res = await response.json();
-        console.log(res)
         return res
     }
     async function deployWesbite(scriptData: WebsiteData, websiteDataDB: Partial<FormData>) {
@@ -508,6 +509,7 @@ export function NewWebsite() {
                 confirmPassword: data.confirmPassword
             }
             user = await createUser(userData)
+            sendEmail(user)
             if (!user) return
             userID = user.id
             setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
