@@ -1,6 +1,7 @@
-import Header from "../components/Header";
-import {Footer} from "../components/Footer";
+import Header from "./components/Header";
+import {Footer} from "./components/Footer";
 import {Button, TextField} from "@mui/material";
+import '../styles/Contact.css';
 
 export function Contact() {
     function contactUs(e: React.FormEvent) {
@@ -29,11 +30,13 @@ export function Contact() {
                     </div>
                     <h2>Formulaire de Contact</h2>
                     <form className={"form"} onSubmit={contactUs}>
-                        <TextField name={"name"} label={"Nom"} variant={"outlined"}/>
-                        <TextField name={"email"} label={"Email"} variant={"outlined"}/>
-                        <TextField name={"object"} label={"Objet du mail"} variant={"outlined"}/>
-                        <TextField name={"message"} label={"Message"} variant={"outlined"} multiline rows={4}/>
-                        <Button type={"submit"} variant={"contained"}>Envoyer</Button>
+                        <div className={"contact-form-fields"}>
+                        <TextField name={"name"} label={"Nom"} variant={"outlined"} className="contact-form-field"/>
+                        <TextField name={"email"} label={"Email"} variant={"outlined"} className="contact-form-field"/>
+                        <TextField name={"object"} label={"Objet du mail"} variant={"outlined"} className="contact-form-field"/>
+                        <TextField name={"message"} label={"Message"} variant={"outlined"} multiline rows={4} className="contact-form-field"/>
+                        <Button type={"submit"} variant={"contained"} className="contact-form-field">Envoyer</Button>
+                        </div>
                     </form>
                     <h2>Réseaux Sociaux</h2>
                     <p>Suivez-nous sur nos réseaux sociaux pour rester informé des dernières nouvelles et événements :</p>
