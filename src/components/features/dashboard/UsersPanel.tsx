@@ -65,9 +65,8 @@ export function UsersPanel({userToken}: WebsitesPanelProps){
                         return []
                     }
                     const res = await response.json();
-                    console.log(res)
                     if (res.length === 0) {
-                        setErrorMessage("Aucun site web trouvé")
+                        setErrorMessage("Aucun site web trouvé");
                     }
                     return res;
                 }

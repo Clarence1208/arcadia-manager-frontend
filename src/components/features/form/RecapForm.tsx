@@ -64,10 +64,7 @@ export function RecapForm(props: RecapProps) {
             setProduct(data);
         });
         if (stripe && elements) {
-            console.log("Stripe and elements loaded")
             props.updateFields({stripe: stripe, elements: elements});
-        }else{
-            console.log("Stripe or elements not loaded")
         }
     },[]);
 

@@ -44,11 +44,6 @@ export function Register() {
             emailTo: userData.email,
             userName: userData.firstName + " " + userData.surname,
         }, import.meta.env.VITE_MAIL_PUBLIC_KEY)
-            .then((result) => {
-                console.log(result.text);
-            }, (error) => {
-                console.log(error.text);
-            });
     }
 
     async function handleSubmit() {

@@ -57,7 +57,6 @@ function LogInForm() {
                 return
             }
             const res = await response.json();
-            console.log(res)
             if (sessionContext) {
                 sessionContext.updateUserSession({
                     userId: res.id, loginToken: res.loginToken,

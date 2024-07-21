@@ -91,7 +91,7 @@ export function NewWebsite() {
     const stripePromise = loadStripe("pk_live_51PPPaZBvbnM6p69y7vH2KFYTrszO7Mu94ZlkdSl2hJqk4nJszkBoCEM26kytyJLg1Wk4W6YJ33YwjUjcaenutVqj005pVjqnpO");
     const stripeOptions: StripeElementsOptions = {
         mode: 'subscription',
-        amount: 50,
+        amount: 1099,
         currency: 'eur',
         paymentMethodCreation: 'manual',
     };
@@ -508,7 +508,11 @@ export function NewWebsite() {
             sendEmail(user)
             if (!user) return
             userID = user.id
-            setWebsiteCreationProcess({...websiteCreationProcess,  message: "Votre compte a été créé avec succès!"})
+            setWebsiteCreationProcess({
+                ...websiteCreationProcess,
+                status: "loading",
+                message: "Votre compte a été créé avec succès..."
+            })
             await new Promise(r => setTimeout(r, 1000));
             const loggedUser= await logInUser(data.email, data.password);
         }

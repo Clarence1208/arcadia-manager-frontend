@@ -35,7 +35,6 @@ async function getUserData(userId: number, userToken: string) {
         return {}
     }
     const res = await response.json();
-    console.log(res)
     return res;
 
 }
@@ -81,9 +80,8 @@ export function UserAccountPanel({userId, userToken}: UserPanelProps) {
             }
             return;
         }catch (e){
-            setErrorMessage("Erreur"+e)
-            setOpen(true)
-            console.log("error update", e)
+            setErrorMessage("Erreur"+e);
+            setOpen(true);
         }
     }
 

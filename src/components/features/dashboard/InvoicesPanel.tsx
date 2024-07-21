@@ -36,30 +36,23 @@ export default function InvoicesPanel() {
         const bearer = "Bearer " + userSession?.loginToken;
         const customerId = userSession?.customerId;
         const userId = userSession?.userId;
-        console.log("invoices fetching");
         if (!customerId ){
-            console.log("No customer id")
             return;
         }
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/stripe/invoices/${userId}?customerId=${customerId}`, {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': bearer
-                },
-            });
-            if (!response.ok) {
-                return;
-            }
-            const data = await response.json();
-            console.log(data);
-            return data;
 
-        } catch (e) {
-            console.log("Erreur de récupération des données.");
-
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/stripe/invoices/${userId}?customerId=${customerId}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': bearer
+            },
+        });
+        if (!response.ok) {
+            return;
         }
+        const data = await response.json();
+        return data;
+
     }
     const getSubscription = async () => {
         // Call the API to get the subscription
@@ -81,7 +74,6 @@ export default function InvoicesPanel() {
                 return {};
             }
             const data: Subscription = await response.json();
-            console.log(data);
             return data;
 
         } catch (e) {
@@ -124,7 +116,6 @@ export default function InvoicesPanel() {
                 }
                 setErrorMessage("Abonnement annulé avec succès.");
             }catch (e){
-                console.log(e);
                 setErrorMessage("Erreur" + e)
             }finally {
                 setOpen(true);
@@ -165,7 +156,7 @@ export default function InvoicesPanel() {
                                 <div>
                                     <p>Description: {subscription.product.description}</p>
                                     <p>Coût: {subscription.price.unit_amount /100} €</p>
-                                    <p>Depuis le {new Date(subscription.created_at || 0).toLocaleDateString()}</p>
+                                    <p>Depuis le {new Date((subscription.created_at || 0) *1000) .toLocaleDateString()}</p>
                                     <p>Prochaine facturation le {new Date(subscription.current_period_end || 0).toLocaleDateString()}</p>
                                     <Button variant="contained" color="primary" onClick={() => confirmCancel(subscription.id)}>Se désabonner</Button>
                                     <br/>
@@ -174,6 +165,7 @@ export default function InvoicesPanel() {
                             </div>
                         </div> : null
                     }
+                    <h3>Derniers paiements: </h3>
                     <TableContainer component={Paper} style={{maxHeight: "70vh", overflowY:"scroll"}}>
                         <Table sx={{minWidth: 650}} aria-label="simple table">
                             <TableHead>
@@ -189,7 +181,7 @@ export default function InvoicesPanel() {
                                     invoices && invoices.map((invoice: any) => {
                                         return (
                                             <TableRow key={invoice.id}>
-                                                <TableCell>{new Date(invoice.created).toLocaleDateString()}</TableCell>
+                                                <TableCell>{new Date(invoice.created *1000).toLocaleDateString()}</TableCell>
                                                 <TableCell>{invoice.amount_paid/100} {invoice.currency}</TableCell>
                                                 <TableCell>{invoice.status === "paid" ? "Finalisé": "Non-finalisé"}</TableCell>
                                                 <TableCell><a href={invoice.invoice_pdf} target="_blank" rel="noreferrer"><Download color="primary"/></a></TableCell>
