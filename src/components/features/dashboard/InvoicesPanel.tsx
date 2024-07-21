@@ -156,8 +156,8 @@ export default function InvoicesPanel() {
                                 <div>
                                     <p>Description: {subscription.product.description}</p>
                                     <p>Coût: {subscription.price.unit_amount /100} €</p>
-                                    <p>Depuis le {new Date((subscription.created_at || 0) *1000) .toLocaleDateString()}</p>
-                                    <p>Prochaine facturation le {new Date(subscription.current_period_end || 0).toLocaleDateString()}</p>
+                                    <p>Depuis le {new Date((subscription.created_at || 0) * 1000) .toLocaleDateString()}</p>
+                                    <p>Prochaine facturation le {new Date((subscription.current_period_end || 0) * 1000).toLocaleDateString()}</p>
                                     <Button variant="contained" color="primary" onClick={() => confirmCancel(subscription.id)}>Se désabonner</Button>
                                     <br/>
                                 </div>
